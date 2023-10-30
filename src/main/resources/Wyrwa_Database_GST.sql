@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS "Characters" (
 	"Name"	TEXT NOT NULL,
 	"EstCP"	INTEGER,
 	"ClassID"	INTEGER NOT NULL,
-	PRIMARY KEY("ID"),
-	FOREIGN KEY("ClassID") REFERENCES "Classes"("ClassID") ON UPDATE NO ACTION ON DELETE NO ACTION
+	FOREIGN KEY("ClassID") REFERENCES "Classes"("ClassID") ON UPDATE NO ACTION ON DELETE NO ACTION,
+	PRIMARY KEY("ID")
 );
 CREATE TABLE IF NOT EXISTS "Dungeons" (
 	"ID"	INTEGER NOT NULL,
@@ -38,37 +38,14 @@ CREATE TABLE IF NOT EXISTS "Classes" (
 	"CharacterIcon"	BLOB,
 	PRIMARY KEY("ClassID")
 );
-CREATE TABLE IF NOT EXISTS "QuestData" (
-	"ID"	INTEGER NOT NULL,
-	"QuestName"	TEXT NOT NULL,
-	"ProgressCount"	INTEGER NOT NULL,
-	"CompletionType"	TEXT NOT NULL CHECK("CompletionType" = "REPEAT" OR "CompletionType" = "WEEKLY" OR "CompletionType" = "DAILY" OR "CompletionType" = "ONETIME"),
-	"MaxCompletionCount"	INTEGER NOT NULL,
-	"DungeonID"	INTEGER NOT NULL,
-	"Reward1"	INTEGER NOT NULL,
-	"Reward2"	INTEGER NOT NULL,
-	"Reward3"	INTEGER NOT NULL,
-	"Reward4"	INTEGER NOT NULL,
-	"ED"	INTEGER NOT NULL,
-	"EXP"	INTEGER NOT NULL,
-	"EP"	INTEGER NOT NULL,
-	"PreviousQuest"	INTEGER,
-	"NextQuest"	INTEGER,
-	"CharacterType"	TEXT NOT NULL CHECK("CharacterType" = "ALL" OR "CharacterType" = "LABY" OR "CharacterType" = "NOAH" OR "CharacterType" = "ELPACK"),
-	FOREIGN KEY("Reward2") REFERENCES "ItemData"("ItemID"),
-	FOREIGN KEY("Reward1") REFERENCES "ItemData"("ItemID"),
-	FOREIGN KEY("DungeonID") REFERENCES "Dungeons"("ID") ON UPDATE NO ACTION ON DELETE NO ACTION,
-	FOREIGN KEY("Reward3") REFERENCES "ItemData"("ItemID"),
-	PRIMARY KEY("ID")
-);
 CREATE TABLE IF NOT EXISTS "InventoryData" (
 	"PairID"	INTEGER NOT NULL,
 	"OwnerID"	INTEGER NOT NULL,
 	"ItemID"	INTEGER NOT NULL,
 	"Amount"	INTEGER NOT NULL,
 	FOREIGN KEY("OwnerID") REFERENCES "Characters"("ID"),
-	PRIMARY KEY("PairID"),
-	FOREIGN KEY("ItemID") REFERENCES "ItemData"("ItemID")
+	FOREIGN KEY("ItemID") REFERENCES "ItemData"("ItemID"),
+	PRIMARY KEY("PairID")
 );
 CREATE TABLE IF NOT EXISTS "QuestCompletion" (
 	"PairID"	INTEGER NOT NULL,
@@ -80,6 +57,47 @@ CREATE TABLE IF NOT EXISTS "QuestCompletion" (
 	PRIMARY KEY("PairID"),
 	FOREIGN KEY("CharacterID") REFERENCES "Characters"("ID") ON UPDATE NO ACTION ON DELETE NO ACTION,
 	FOREIGN KEY("QuestID") REFERENCES "QuestData"("ID") ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+CREATE TABLE IF NOT EXISTS "RewardData" (
+	"RewardID"	INTEGER NOT NULL,
+	"ItemID"	INTEGER NOT NULL,
+	"QuestID"	INTEGER NOT NULL,
+	"Amount"	REAL NOT NULL,
+	FOREIGN KEY("QuestID") REFERENCES "QuestData"("ID"),
+	FOREIGN KEY("ItemID") REFERENCES "ItemData"("ItemID"),
+	PRIMARY KEY("RewardID")
+);
+CREATE TABLE IF NOT EXISTS "QuestData" (
+	"ID"	INTEGER NOT NULL,
+	"QuestName"	TEXT NOT NULL,
+	"ProgressCount"	INTEGER NOT NULL,
+	"CompletionType"	TEXT NOT NULL CHECK("CompletionType" = "REPEAT" OR "CompletionType" = "WEEKLY" OR "CompletionType" = "DAILY" OR "CompletionType" = "ONETIME"),
+	"MaxCompletionCount"	INTEGER NOT NULL,
+	"DungeonID"	INTEGER NOT NULL,
+	"ED"	INTEGER NOT NULL,
+	"EXP"	INTEGER NOT NULL,
+	"EP"	INTEGER NOT NULL,
+	"PreviousQuest"	INTEGER,
+	"NextQuest"	INTEGER,
+	"CharacterType"	TEXT NOT NULL CHECK("CharacterType" = "ALL" OR "CharacterType" = "LABY" OR "CharacterType" = "NOAH" OR "CharacterType" = "ELPACK"),
+	FOREIGN KEY("DungeonID") REFERENCES "Dungeons"("ID") ON UPDATE NO ACTION ON DELETE NO ACTION,
+	PRIMARY KEY("ID")
+);
+CREATE TABLE IF NOT EXISTS "Goals" (
+	"GoalID"	INTEGER NOT NULL,
+	"CharacterID"	INTEGER NOT NULL,
+	"Priority"	REAL,
+	PRIMARY KEY("GoalID"),
+	FOREIGN KEY("CharacterID") REFERENCES "Characters"("ID")
+);
+CREATE TABLE IF NOT EXISTS "GoalItems" (
+	"ID"	INTEGER NOT NULL,
+	"GoalID"	INTEGER NOT NULL,
+	"ItemID"	INTEGER NOT NULL,
+	"Amount"	INTEGER NOT NULL,
+	FOREIGN KEY("ItemID") REFERENCES "ItemData"("ItemID"),
+	FOREIGN KEY("GoalID") REFERENCES "Goals"("GoalID"),
+	PRIMARY KEY("ID")
 );
 INSERT INTO "EventTable" ("DayOfMonth","EventType") VALUES (1,'RM100');
 INSERT INTO "EventTable" ("DayOfMonth","EventType") VALUES (2,'HEROIC2');
@@ -112,6 +130,22 @@ INSERT INTO "EventTable" ("DayOfMonth","EventType") VALUES (28,'ROSSO2');
 INSERT INTO "EventTable" ("DayOfMonth","EventType") VALUES (29,'SD2');
 INSERT INTO "EventTable" ("DayOfMonth","EventType") VALUES (30,'PROF50');
 INSERT INTO "EventTable" ("DayOfMonth","EventType") VALUES (31,'RM100');
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (1,'Ruruelam',1500000,28);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (2,'Rurue',900000,50);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (3,'Kyoan',750000,19);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (4,'Aspie',700000,51);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (5,'Pijen',700000,55);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (6,'Eunru',750000,25);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (7,'Supyeon',700000,54);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (8,'Apifera',450000,6);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (9,'Jinjeong',550000,53);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (10,'Mokke',500000,49);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (11,'MissEm',500000,52);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (12,'Senja',500000,11);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (13,'Eumhobu',450000,56);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (14,'Sushifa',500000,23);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (15,'Herrschia',NULL,18);
+INSERT INTO "Characters" ("ID","Name","EstCP","ClassID") VALUES (16,'Samcheon',NULL,17);
 INSERT INTO "Dungeons" ("ID","Name","MinCP","OptimalCP","Region") VALUES (1,'Hall Of El',50000,300000,'Elrianode');
 INSERT INTO "Dungeons" ("ID","Name","MinCP","OptimalCP","Region") VALUES (2,'Water Dragon Sanctum',50000,300000,'Elrianode');
 INSERT INTO "Dungeons" ("ID","Name","MinCP","OptimalCP","Region") VALUES (3,'Elrianode City',50000,300000,'Elrianode');
@@ -194,14 +228,14 @@ INSERT INTO "Classes" ("ClassID","ClassName","ShortClassName","CharacterName","D
 CREATE UNIQUE INDEX IF NOT EXISTS "ClassID" ON "Characters" (
 	"ClassID"
 );
-CREATE INDEX IF NOT EXISTS "DungeonID" ON "QuestData" (
-	"DungeonID"
-);
 CREATE UNIQUE INDEX IF NOT EXISTS "CharacterID" ON "QuestCompletion" (
 	"CharacterID",
 	"QuestID"
 );
 CREATE INDEX IF NOT EXISTS "QuestID" ON "QuestCompletion" (
 	"QuestID"
+);
+CREATE INDEX IF NOT EXISTS "DungeonID" ON "QuestData" (
+	"DungeonID"
 );
 COMMIT;

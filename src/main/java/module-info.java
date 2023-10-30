@@ -6,4 +6,6 @@ module els.wyrwatracker {
 
     opens els.wyrwatracker to javafx.fxml;
     exports els.wyrwatracker;
+    exports els.sqliteIO;
+    opens els.sqliteIO to javafx.fxml;
 }
