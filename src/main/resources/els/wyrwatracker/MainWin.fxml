@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="els.wyrwatracker.MainWinController">
+   <children>
+      <TabPane layoutY="-2.0" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab fx:id="PrzegladTab" closable="false" text="Przegląd">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="364.0" prefWidth="407.0">
+                     <children>
+                        <TabPane layoutX="-1.0" layoutY="1.0" prefHeight="370.0" prefWidth="600.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab closable="false" text="Postaci">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="370.0" prefWidth="571.0">
+                                       <children>
+                                          <Separator layoutX="366.0" orientation="VERTICAL" prefHeight="376.0" prefWidth="4.0" />
+                                          <ListView fx:id="CharacterList" layoutX="366.0" prefHeight="369.0" prefWidth="200.0" />
+                                          <ScrollPane prefHeight="371.0" prefWidth="365.0">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="457.0" prefWidth="356.0">
+                                                   <children>
+                                                      <ImageView fx:id="ClassIcon" fitHeight="56.0" fitWidth="61.0" layoutX="14.0" layoutY="13.0" pickOnBounds="true" preserveRatio="true" />
+                                                      <Label fx:id="CharacterName" layoutX="115.0" layoutY="21.0" text="IGN:" />
+                                                      <TextField fx:id="CharacterNameField" editable="false" layoutX="156.0" layoutY="17.0" onMouseClicked="#EnableCharNameEdit" />
+                                                      <Label fx:id="ClassName" layoutX="105.0" layoutY="49.0" text="Klasa:" />
+                                                      <TextField fx:id="ClassNameField" editable="false" layoutX="156.0" layoutY="45.0" onMouseClicked="#EnableClassNameEdit" />
+                                                      <Label fx:id="EstCP" layoutX="85.0" layoutY="79.0" text="Szac. CP:" />
+                                                      <TextField fx:id="EstCPField" editable="false" layoutX="156.0" layoutY="75.0" onMouseClicked="#EnableEstCPEdit" />
+                                                      <Label layoutX="17.0" layoutY="237.0" text="Ekwipunek" />
+                                                      <TableView layoutX="17.0" layoutY="253.0" prefHeight="197.0" prefWidth="323.0">
+                                                        <columns>
+                                                          <TableColumn editable="false" prefWidth="184.0" text="Przedmiot" />
+                                                          <TableColumn prefWidth="58.0" text="Ilość" />
+                                                            <TableColumn text="Wartość" />
+                                                        </columns>
+                                                      </TableView>
+                                                      <ChoiceBox fx:id="ConfigChoice" layoutX="158.0" layoutY="205.0" prefWidth="150.0" />
+                                                      <Label layoutX="66.0" layoutY="209.0" text="Konfiguracja:" />
+                                                      <Label fx:id="EstCP1" layoutX="85.0" layoutY="111.0" text="Dod. EXP:" />
+                                                      <TextField fx:id="EXPMultipField" editable="false" layoutX="156.0" layoutY="107.0" onMouseClicked="#EnableEXPMultipEdit" />
+                                                      <Label fx:id="EstCP11" layoutX="85.0" layoutY="141.0" text="Dod. ED:" />
+                                                      <TextField fx:id="EDMultipField" editable="false" layoutX="156.0" layoutY="137.0" onMouseClicked="#EnableEDMultipEdit" />
+                                                      <Label fx:id="EstCP111" layoutX="85.0" layoutY="171.0" text="Dod. ID:" />
+                                                      <TextField fx:id="IDMultipField" editable="false" layoutX="156.0" layoutY="167.0" onMouseClicked="#EnableIDMultipEdit" />
+                                                   </children>
+                                                </AnchorPane>
+                                            </content>
+                                          </ScrollPane>
+                                          <TextArea editable="false" layoutX="366.0" layoutY="1.0" prefHeight="368.0" prefWidth="200.0" />
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                            <Tab closable="false" text="Plansze">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                              </content>
+                            </Tab>
+                          </tabs>
+                        </TabPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="CeleTab" text="Cele">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>

@@ -10,15 +10,17 @@ import java.lang.reflect.InvocationTargetException;
 
 
 public class HelloApplication extends Application {
+
     @Override
     public void start(Stage stage) throws IOException {
+
             try {
+                stage.setTitle("Wyrwa Tracker 1.0");
                 FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("MenuTest.fxml"));
-                Scene scene = new Scene(fxmlLoader.load(), 700, 400);
-                /*SQLiteIO testManager = new SQLiteIO();
-                testManager.ConnectToBase("jdbc:sqlite:src/main/resources/Wyrwa_Tracker_Data");*/
-                stage.setTitle("Hello! ");
-                stage.setScene(scene);
+                ControllerMain menuController = (ControllerMain) fxmlLoader.getController();
+                menuController.giveParent(stage);
+                Scene scena1 = new Scene(fxmlLoader.load(), 700, 400);
+                stage.setScene(scena1);
                 stage.show();
             }
             catch(Exception e)

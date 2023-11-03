@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<Pane prefHeight="376.0" prefWidth="602.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="els.wyrwatracker.ControllerMain">
+    <children>
+        <AnchorPane fx:id="WelcomePanel" maxHeight="-1.0" maxWidth="-1.0" prefHeight="280.0" prefWidth="515.0">
+            <children>
+                <Label fx:id="TextPowitanie" layoutX="68.0" layoutY="88.0" text="Witaj w Wyrwa Trackerze!">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Button fx:id="PrzyciskNowaBaza" layoutX="68.0" layoutY="200.0" mnemonicParsing="false" onAction="#UtworzNowaBaze" text="Utwórz nową bazę" />
+                <Button fx:id="PrzyciskWczytaj" layoutX="418.0" layoutY="128.0" mnemonicParsing="false" onAction="#Wczytaj" text="Wczytaj" />
+                <ChoiceBox fx:id="DatabaseChoice" layoutX="268.0" layoutY="128.0" prefWidth="150.0" />
+                <TextField fx:id="NewDatabaseName" layoutX="68.0" layoutY="128.0" promptText="Nazwa nowej bazy" />
+                <Button fx:id="PrzyciskUsun" layoutX="418.0" layoutY="152.0" mnemonicParsing="false" onAction="#Usun" text="Usuń" />
+                <ChoiceBox fx:id="wyborWersji" layoutX="68.0" layoutY="164.0" prefWidth="150.0" />
+                <Line endX="-106.0" endY="347.0" layoutX="357.0" layoutY="134.0" startX="-106.0" startY="-3.29290771484375" />
+            </children>
+        </AnchorPane>
+    </children>
+</Pane>
