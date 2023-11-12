@@ -203,7 +203,7 @@ public class MainWinController {
 
     public void WybierzPostac(MouseEvent mouseEvent) {
         String nazwaPostaci = CharacterList.getSelectionModel().getSelectedItem();
-        ZaładujPostac(konto.PobierzPostac(nazwaPostaci));
+        ZaladujPostac(konto.PobierzPostac(nazwaPostaci));
     }
 
     public void InicjujHandleryPol(){
