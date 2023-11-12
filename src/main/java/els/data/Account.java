@@ -7,8 +7,9 @@ import java.util.ArrayList;
 public class Account {
     ArrayList<Postac> listaPostaci = new ArrayList<Postac>();
 
-    public void DodajPostac(Postac postac){
+    public Postac DodajPostac(Postac postac){
         listaPostaci.add(postac);
+        return postac;
     }
 
     public Postac PobierzPostac(int ID){

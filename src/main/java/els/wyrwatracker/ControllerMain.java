@@ -1,11 +1,16 @@
 package els.wyrwatracker;
 
+import els.data.Account;
 import els.filehandlers.FileNotFoundException;
 import els.filehandlers.ServerListHandler;
 
+import els.mediators.GeneralMediator;
+import els.sqliteIO.NoActiveConnectionException;
 import els.sqliteIO.SQLiteConnector;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,6 +24,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ControllerMain {
@@ -74,16 +80,8 @@ public class ControllerMain {
                 DatabaseChoice.getItems().add(nowaBaza);
                 list.add(nowaBaza);
                 serverList.SaveServerList();
-                try{
-                    FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("MainWin.fxml"));
-                    Scene scena2 = new Scene(fxmlLoader.load(), 700,400);
-                    parent.setScene(scena2);
-                    MainWinController dzieciak = (MainWinController) fxmlLoader.getController();
-                    dzieciak.OdbierzSQLHandler(sqLiteConnector);
-                }
-                catch(IOException e){
-                    System.err.println("Hurrrr" + e.getMessage());
-                }
+                inicjujProgram(sqLiteConnector);
+
             } else if(list.contains(nowaBaza)) {
                 TextPowitanie.setText("Baza o tej nazwie już istnieje!");
             }
@@ -98,16 +96,7 @@ public class ControllerMain {
         String nazwaBazy = DatabaseChoice.getValue();
         SQLiteConnector slqHandler = new SQLiteConnector();
         slqHandler.ConnectToBase(nazwaBazy);
-        try{
-            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("MainWin.fxml"));
-            Scene scena2 = new Scene(fxmlLoader.load(), 700,400);
-            parent.setScene(scena2);
-            MainWinController dzieciak = (MainWinController) fxmlLoader.getController();
-            dzieciak.OdbierzSQLHandler(slqHandler);
-        }
-        catch(IOException e){
-            System.err.println("Hurrrr");
-        }
+        inicjujProgram(slqHandler);
     }
    @FXML
     public void initialize(){
@@ -125,4 +114,28 @@ public class ControllerMain {
         }
     }
     public static void giveParent(Stage scena){parent = scena;}
+
+    void inicjujProgram(SQLiteConnector sqlHandler){
+        try{
+            GeneralMediator mediator = new GeneralMediator(sqlHandler);
+            Account konto = new Account();
+            mediator.initialize(konto);
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("MainWin.fxml"));
+            Scene scena2 = new Scene(fxmlLoader.load(), 700,400);
+            parent.setScene(scena2);
+            MainWinController dzieciak = (MainWinController) fxmlLoader.getController();
+            dzieciak.OdbierzSQLHandler(sqlHandler);
+            dzieciak.OdbierzKonto(konto);
+            dzieciak.PostaciLoadUnload(new Event(new EventType<>()));
+        }
+        catch(IOException e){
+            System.err.println("Hurrrr");
+        }
+        catch(NoActiveConnectionException e){
+            System.err.println("Połączenie yeeeet");
+        }
+        catch(SQLException e){
+            System.err.println("Umiesz w SQL?");
+        }
+    }
 }
