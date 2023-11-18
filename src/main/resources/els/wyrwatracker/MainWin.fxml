@@ -42,11 +42,11 @@
                                                       <Label fx:id="EstCP" layoutX="85.0" layoutY="79.0" text="Szac. CP:" />
                                                       <TextField fx:id="EstCPField" editable="false" layoutX="156.0" layoutY="75.0" onMouseClicked="#EnableEstCPEdit" />
                                                       <Label layoutX="17.0" layoutY="237.0" text="Ekwipunek" />
-                                                      <TableView layoutX="17.0" layoutY="253.0" prefHeight="197.0" prefWidth="323.0">
+                                                      <TableView fx:id="Ekwipunek" layoutX="17.0" layoutY="253.0" prefHeight="197.0" prefWidth="323.0">
                                                         <columns>
-                                                          <TableColumn editable="false" prefWidth="184.0" text="Przedmiot" />
-                                                          <TableColumn prefWidth="58.0" text="Ilość" />
-                                                            <TableColumn text="Wartość" />
+                                                          <TableColumn fx:id="Przedmiot" editable="false" prefWidth="184.0" text="Przedmiot" />
+                                                          <TableColumn fx:id="Ilosc" prefWidth="58.0" text="Ilość" />
+                                                            <TableColumn fx:id="Wartosc" text="Wartość" />
                                                         </columns>
                                                       </TableView>
                                                       <ChoiceBox fx:id="ConfigChoice" layoutX="158.0" layoutY="205.0" prefWidth="150.0" />
@@ -69,11 +69,11 @@
                                     </AnchorPane>
                               </content>
                             </Tab>
-                            <Tab closable="false" text="Plansze">
+                            <Tab closable="false" text="Plansze" onSelectionChanged="#InitiateDungeonView">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TreeView layoutX="388.0" layoutY="1.0" prefHeight="369.0" prefWidth="181.0" />
+                                          <TreeView fx:id="ListaPlansz" layoutX="388.0" layoutY="1.0" prefHeight="369.0" prefWidth="181.0" />
                                           <Label layoutX="21.0" layoutY="14.0" text="Nazwa planszy: " />
                                           <Label fx:id="NazwaPlanszy" layoutX="127.0" layoutY="14.0" prefHeight="16.0" prefWidth="104.0" />
                                           <Label layoutX="21.0" layoutY="38.0" text="Bazowe EXP:" />

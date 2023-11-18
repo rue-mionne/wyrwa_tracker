@@ -4,6 +4,8 @@ import els.data.Postac;
 import els.sqliteIO.NoActiveConnectionException;
 import els.sqliteIO.SQLiteConnector;
 import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -12,8 +14,12 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.sql.Connection;
@@ -21,18 +27,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Optional;
 
 import els.data.*;
 import els.mediators.*;
+import javafx.util.Callback;
+import javafx.util.converter.IntegerStringConverter;
 
 public class MainWinController {
     SQLiteConnector sqlboss;
+
+    EnumSet<Postac.SaveFlags> flagiZapisu;
     ObservableList<String> olistBuilds;
     @FXML
     private Tab PostaciTab;
     @FXML
     private Tab CeleTab;
+
+    @FXML
+    private TableView<Item> Ekwipunek;
+    @FXML
+    private TableColumn<Item,String> Przedmiot;
+    @FXML
+    private TableColumn<Item,Integer> Ilosc;
+    @FXML
+    private TableColumn<Item,Integer> Wartosc;
+
 
     @FXML
     private ListView<String> CharacterList;
@@ -166,6 +187,7 @@ public class MainWinController {
     }
 
     void ZaladujPostac(Postac postac){
+        flagiZapisu = EnumSet.of(Postac.SaveFlags.IGN);
         ConfigChoice.getSelectionModel().clearSelection();
         CharacterNameField.setText(postac.getIGN());
         ClassNameField.getSelectionModel().select(postac.getClassName());
@@ -173,7 +195,8 @@ public class MainWinController {
         ClassNameField.getItems().clear();
         ClassNameField.getSelectionModel().select(selected);
         try{
-        InitiateClassChoice();
+            InitiateClassChoice();
+            InicjujEkwipunek(postac);
         }
         catch(NoActiveConnectionException e){
             System.err.println("Połączenie wyparowało");
@@ -199,6 +222,7 @@ public class MainWinController {
             ConfigChoice.getItems().clear();
         }
 
+
     }
 
     public void WybierzPostac(MouseEvent mouseEvent) {
@@ -207,20 +231,31 @@ public class MainWinController {
     }
 
     public void InicjujHandleryPol(){
-        /*
+
         CharacterNameField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String old, String newval) {
                 if(old.equals(CharacterList.getSelectionModel().getSelectedItem())) {
                     String staraNazwaPostaci = CharacterList.getSelectionModel().getSelectedItem();
-                    System.out.println(newval);
                     Postac postac = konto.PobierzPostac(staraNazwaPostaci);
                     postac.setIGN(newval);
                     CharacterList.getItems().set((postac.getID() - 1), newval);
-                    //schedule database update
+                    if(newval!=null)
+                        flagiZapisu.add(Postac.SaveFlags.IGN);
                 }
             }
-        });*/
+        });
+
+        ClassNameField.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
+                postac.setClassName(t1);
+                if(t1!=null)
+                    flagiZapisu.add(Postac.SaveFlags.ClassName);
+            }
+        });
+
         EstCPField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String old, String newval) {
@@ -228,7 +263,8 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(EstCPField))
                     build.EstCP= Integer.parseInt(newval);
-                //schedule CPUpdate
+                if(newval!=null)
+                    flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
 
@@ -239,7 +275,8 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(EDMultipField))
                     build.EDMultip= Integer.parseInt(newval);
-                //schedule EDUpdate
+                if(newval!=null)
+                    flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
 
@@ -250,7 +287,8 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(IDMultipField))
                     build.IDMultip= Integer.parseInt(newval);
-                //schedule IDUpdate
+                if(newval!=null)
+                    flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
 
@@ -261,7 +299,8 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(EDMultipField))
                     build.EDMultip= Integer.parseInt(newval);
-                //schedule CPUpdate
+                if(newval!=null)
+                        flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
         EXPMultipField.textProperty().addListener(new ChangeListener<String>() {
@@ -271,7 +310,8 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(EXPMultipField))
                     build.EXPMultip= Integer.parseInt(newval);
-                //schedule CPUpdate
+                if(newval!=null)
+                        flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
 
@@ -282,6 +322,8 @@ public class MainWinController {
                    if(newval!= postac.getClassName()&&newval!=null){
                        postac.setClassName(ClassNameField.getValue());
                    }
+                   if(newval!=null)
+                       flagiZapisu.add(Postac.SaveFlags.ClassName);
                }
             }
         );
@@ -329,5 +371,98 @@ public class MainWinController {
             }}
         }
     }
+
+    private void InicjujEkwipunek(Postac postac) throws NoActiveConnectionException, SQLException{
+        Inventory ekwipunek = postac.PobierzListePrzedmiotow();
+        //zapełnij ekwipunek/odśwież ekwipunek
+        if(ekwipunek.getListaPrzedmiotow().isEmpty()){
+            ItemSQLMediator.loadInventory(postac,sqlboss);
+        }
+        Ekwipunek.setItems(null);
+        if(!ekwipunek.getListaPrzedmiotow().isEmpty()){
+            ObservableList<Item> sledzEq = FXCollections.observableArrayList(ekwipunek.getListaPrzedmiotow());
+            Ekwipunek.setItems(sledzEq);
+            Przedmiot.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, String>, ObservableValue<String>>() {
+                @Override
+                public ObservableValue<String> call(TableColumn.CellDataFeatures<Item, String> cellDataFeatures) {
+                    return cellDataFeatures.getValue().getName();
+                }
+            });
+
+            Ilosc.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, Integer>, ObservableValue<Integer>>() {
+                @Override
+                public ObservableValue<Integer> call(TableColumn.CellDataFeatures<Item, Integer> itemIntegerCellDataFeatures) {
+                    return itemIntegerCellDataFeatures.getValue().getAmount().asObject();
+                }
+            });
+
+            Wartosc.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, Integer>, ObservableValue<Integer>>() {
+                @Override
+                public ObservableValue<Integer> call(TableColumn.CellDataFeatures<Item, Integer> itemIntegerCellDataFeatures) {
+                    return itemIntegerCellDataFeatures.getValue().getSalePrice().asObject();
+                }
+            });
+            /*Ekwipunek.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent keyEvent) {
+                    if(keyEvent.getCode()== KeyCode.ENTER){
+                        return;
+                    }
+                    if(Ekwipunek.getEditingCell()==null){
+                        if(keyEvent.getCode().isLetterKey()||keyEvent.getCode().isDigitKey()){
+                            TablePosition focusedCellPosiotion = Ekwipunek.getFocusModel().getFocusedCell();
+                            Ekwipunek.edit(focusedCellPosiotion.getRow(),focusedCellPosiotion.getTableColumn());
+                        }
+                    }
+                }
+            });*/
+            Ilosc.setEditable(true);
+            Ilosc.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+
+            Ilosc.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Item, Integer>>() {
+                @Override
+                public void handle(TableColumn.CellEditEvent<Item, Integer> itemIntegerCellEditEvent) {
+                    itemIntegerCellEditEvent.getRowValue().setAmount(itemIntegerCellEditEvent.getNewValue());
+                }
+            });
+            Wartosc.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+            Wartosc.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Item, Integer>>() {
+                @Override
+                public void handle(TableColumn.CellEditEvent<Item, Integer> itemIntegerCellEditEvent) {
+                    itemIntegerCellEditEvent.getRowValue().setAmount(itemIntegerCellEditEvent.getNewValue());
+                }
+            });
+        }
+    }
+    //
+    //
+    //
+    //
+    //
+    /////
+    /////Dungeon Tab
+    /////
+    //
+    //
+    //
+    //
+
+    @FXML
+    private Label NazwaPlanszy;
+    @FXML
+    private Label BaseEXPValue;
+    @FXML
+    private Label BaseEDValue;
+    @FXML
+    private Label MinCP;
+    @FXML
+    private TreeView<String> ListaPlansz;
+
+    @FXML
+    private void InitiateDungeonView(){
+
+    }
 }
+
+
 

@@ -1,10 +1,16 @@
 package els.data;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
+
 public class Item implements Cloneable {
     int ID;
-    String Name;
-    int Amount;
-    int SalePrice;
+    StringProperty Name;
+    IntegerProperty Amount;
+    IntegerProperty SalePrice;
     boolean Sellable;
     boolean Shareable;
 
@@ -14,36 +20,36 @@ public class Item implements Cloneable {
     //TEMPORARY CONSTRUCTOR FOR TESTING, NEED DATABASE INTERFACE
     public Item(int ID, String name, int amount, int salePrice, boolean sellable, boolean shareable) {
         this.ID = ID;
-        Name = name;
-        Amount = amount;
-        SalePrice = salePrice;
+        Name = new SimpleStringProperty(name);
+        Amount = new SimpleIntegerProperty(amount);
+        SalePrice = new SimpleIntegerProperty(salePrice);
         Sellable = sellable;
         Shareable = shareable;
     }
 
-    public String getName() {
+    public StringProperty getName() {
         return Name;
     }
 
     public void setName(String name) {
-        Name = name;
+        Name.setValue(name);
     }
 
-    public int getAmount() {
+    public IntegerProperty getAmount() {
         return Amount;
     }
 
     public Item setAmount(int amount) {
-        Amount = amount;
+        Amount.setValue(amount);
         return this;
     }
 
-    public int getSalePrice() {
+    public IntegerProperty getSalePrice() {
         return SalePrice;
     }
 
     public void setSalePrice(int salePrice) {
-        SalePrice = salePrice;
+        SalePrice.setValue(salePrice);
     }
 
     public boolean isSellable() {
