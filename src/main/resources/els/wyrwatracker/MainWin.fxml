@@ -69,27 +69,27 @@
                                     </AnchorPane>
                               </content>
                             </Tab>
-                            <Tab closable="false" text="Plansze" onSelectionChanged="#InitiateDungeonView">
+                            <Tab closable="false" onSelectionChanged="#InitiateDungeonView" text="Plansze">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
                                           <TreeView fx:id="ListaPlansz" layoutX="388.0" layoutY="1.0" prefHeight="369.0" prefWidth="181.0" />
                                           <Label layoutX="21.0" layoutY="14.0" text="Nazwa planszy: " />
-                                          <Label fx:id="NazwaPlanszy" layoutX="127.0" layoutY="14.0" prefHeight="16.0" prefWidth="104.0" />
+                                          <Label fx:id="NazwaPlanszy" layoutX="127.0" layoutY="14.0" prefHeight="16.0" prefWidth="232.0" />
                                           <Label layoutX="21.0" layoutY="38.0" text="Bazowe EXP:" />
-                                          <Label fx:id="BaseEXPValue" layoutX="126.0" layoutY="38.0" />
+                                          <Label fx:id="BaseEXPValue" layoutX="126.0" layoutY="38.0" prefHeight="16.0" prefWidth="230.0" />
                                           <Label layoutX="21.0" layoutY="60.0" text="Bazowe ED:" />
-                                          <Label fx:id="BaseEDValue" layoutX="126.0" layoutY="60.0" />
+                                          <Label fx:id="BaseEDValue" layoutX="126.0" layoutY="60.0" prefHeight="16.0" prefWidth="237.0" />
                                           <Label layoutX="17.0" layoutY="83.0" text="Minimalne CP:" />
-                                          <Label fx:id="MinCP" layoutX="125.0" layoutY="83.0" />
+                                          <Label fx:id="MinCP" layoutX="125.0" layoutY="83.0" prefHeight="16.0" prefWidth="238.0" />
                                           <Label layoutX="14.0" layoutY="120.0" text="Lista misji:" />
-                                          <TableView layoutX="14.0" layoutY="136.0" prefHeight="235.0" prefWidth="183.0">
+                                          <TableView fx:id="ListaMisji" layoutX="14.0" layoutY="136.0" prefHeight="235.0" prefWidth="183.0">
                                             <columns>
                                               <TableColumn prefWidth="75.0" text="Rodzaj:" />
                                               <TableColumn prefWidth="107.0" text="Postać:" />
                                             </columns>
                                           </TableView>
-                                          <TableView layoutX="197.0" layoutY="136.0" prefHeight="235.0" prefWidth="190.0">
+                                          <TableView fx:id="ListaPrzedmiotow" layoutX="197.0" layoutY="136.0" prefHeight="235.0" prefWidth="190.0">
                                             <columns>
                                               <TableColumn prefWidth="92.0" text="Nazwa:" />
                                               <TableColumn prefWidth="96.0" text="Ilość na run:" />

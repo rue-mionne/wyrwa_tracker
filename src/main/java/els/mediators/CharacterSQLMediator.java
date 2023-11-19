@@ -32,9 +32,6 @@ public class CharacterSQLMediator {
         return build;
     }
 
-    public static void ReadInventory(Postac postac, SQLiteConnector connector){
-
-    }
 
     //UWAGA Item jest częścią należącą do ekwipunku, ale konieczną do zapełnienia innych modułów; przeanalizuj, jaki mediator go weźmie
     //UWAGA2 planując, patrz na powiązania - jeżeli element jest kluczem zewnętrznym, prawdopodobnie tabela potrzebuje mediatora pod ten klucz

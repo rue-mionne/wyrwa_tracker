@@ -102,6 +102,7 @@ public class MainWinController {
 
     @FXML
     private Tab PrzegladTab;
+    private Database baza;
     private Account konto;
 
     @FXML
@@ -141,8 +142,9 @@ public class MainWinController {
         sqlboss = SQLConnector;
     }
 
-    public void OdbierzKonto(Account konto){
-        this.konto = konto;
+    public void OdbierzBaze(Database base){
+        this.baza = base;
+        this.konto = base.konto;
     }
 
 
@@ -457,11 +459,63 @@ public class MainWinController {
     private Label MinCP;
     @FXML
     private TreeView<String> ListaPlansz;
+    @FXML
+    private TableView ListaMisji;
+    @FXML
+    private TableView ListaPrzedmiotow;
 
     @FXML
     private void InitiateDungeonView(){
+        try {
+            DungeonSQLMediator.loadDungeonList(baza.drzewoPlansz, sqlboss);
+            if(ListaPlansz.getRoot()==null)
+                InitiateTreeView();
+            //import data of first dungeon
+        }
+        catch(SQLException e){
+            System.err.println("Literówka");
+            System.err.println(e.getMessage());
+        }
+        catch(NoActiveConnectionException e){
+            System.err.println("Boss umarł");
+        }
+    }
+
+    private void InitiateTreeView(){
+        TreeItem<String> root = new TreeItem<String>("Dungeons");
+        root.setExpanded(true);
+        for(Region region : baza.drzewoPlansz.getListaRegionow()){
+            TreeItem<String> newRegion = new TreeItem<String>(region.getName());
+            root.getChildren().add(newRegion);
+            for(String plansza : region.getDungeonList()){
+                newRegion.getChildren().add(new TreeItem<String>(plansza));
+            }
+
+        }
+        ListaPlansz.setRoot(root);
+        ListaPlansz.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<String>>() {
+            @Override
+            public void changed(ObservableValue<? extends TreeItem<String>> observableValue, TreeItem<String> stringTreeItem, TreeItem<String> t1) {
+                if(t1.isLeaf()){
+                    NazwaPlanszy.setText(t1.getValue());
+                    Dungeon plansza = baza.drzewoPlansz.getRegion(t1.getParent().getValue()).getDungeon(t1.getValue());
+                    BaseEXPValue.setText(String.valueOf(plansza.getBaseEXP()));
+                    BaseEDValue.setText(String.valueOf(plansza.getBaseED()));
+                    MinCP.setText(String.valueOf(plansza.getMinCP()));
+                }
+            }
+        });
+    }
+
+    private void InitiateQuestPrev(Dungeon dungeon){
 
     }
+
+    private void InitiateItemPrev(Dungeon dungeon){
+
+    }
+
+
 }
 
 

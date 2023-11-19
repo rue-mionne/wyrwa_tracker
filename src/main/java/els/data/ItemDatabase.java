@@ -1,18 +1,21 @@
 package els.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import els.mediators.ItemSQLMediator;
 
 public class ItemDatabase {
-    ArrayList<Item> database=new ArrayList<Item>();
+    Map<Integer,Item> database=new HashMap<>();
 
     public void ImportujDanePrzedmiotu(Item przedmiot){
         int ID = przedmiot.ID;
-        database.add(ID, przedmiot);
+        database.put(ID, przedmiot);
     }
 
     public Item PobierzPrzedmiot(int ID){
-        if(database.get(ID)!=null){
+        if(database.containsKey(ID)){
             return database.get(ID);
         }
         else{

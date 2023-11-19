@@ -1,6 +1,8 @@
 package els.wyrwatracker;
 
 import els.data.Account;
+import els.data.Database;
+import els.data.DungeonTree;
 import els.filehandlers.FileNotFoundException;
 import els.filehandlers.ServerListHandler;
 
@@ -118,14 +120,18 @@ public class ControllerMain {
     void inicjujProgram(SQLiteConnector sqlHandler){
         try{
             GeneralMediator mediator = new GeneralMediator(sqlHandler);
+            Database baza = new Database();
             Account konto = new Account();
+            baza.konto=konto;
+            DungeonTree drzewo = new DungeonTree();
+            baza.drzewoPlansz = drzewo;
             mediator.initialize(konto);
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("MainWin.fxml"));
             Scene scena2 = new Scene(fxmlLoader.load(), 700,400);
             parent.setScene(scena2);
             MainWinController dzieciak = (MainWinController) fxmlLoader.getController();
             dzieciak.OdbierzSQLHandler(sqlHandler);
-            dzieciak.OdbierzKonto(konto);
+            dzieciak.OdbierzBaze(baza);
             dzieciak.PostaciLoadUnload(new Event(new EventType<>()));
         }
         catch(IOException e){
