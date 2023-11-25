@@ -125,6 +125,7 @@ public class ControllerMain {
             baza.konto=konto;
             DungeonTree drzewo = new DungeonTree();
             baza.drzewoPlansz = drzewo;
+            baza.sqlCon=sqlHandler;
             mediator.initialize(konto);
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("MainWin.fxml"));
             Scene scena2 = new Scene(fxmlLoader.load(), 700,400);

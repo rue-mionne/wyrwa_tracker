@@ -5,6 +5,7 @@ import els.sqliteIO.NoActiveConnectionException;
 import els.sqliteIO.SQLiteConnector;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -36,6 +37,7 @@ import javafx.util.Callback;
 import javafx.util.converter.IntegerStringConverter;
 
 public class MainWinController {
+
     SQLiteConnector sqlboss;
 
     EnumSet<Postac.SaveFlags> flagiZapisu;
@@ -105,6 +107,10 @@ public class MainWinController {
     private Database baza;
     private Account konto;
 
+    @FXML
+    private ScrollPane MainClassWin;
+    @FXML
+    private ScrollPane QuestsForCharacter;
     @FXML
     void EnableCharNameEdit(MouseEvent event) {
         CharacterNameField.setEditable(true);
@@ -378,12 +384,29 @@ public class MainWinController {
         Inventory ekwipunek = postac.PobierzListePrzedmiotow();
         //zapełnij ekwipunek/odśwież ekwipunek
         if(ekwipunek.getListaPrzedmiotow().isEmpty()){
-            ItemSQLMediator.loadInventory(postac,sqlboss);
+            ItemSQLMediator.loadInventory(postac,sqlboss,baza.bazaPrzedmiotow);
         }
         Ekwipunek.setItems(null);
         if(!ekwipunek.getListaPrzedmiotow().isEmpty()){
             ObservableList<Item> sledzEq = FXCollections.observableArrayList(ekwipunek.getListaPrzedmiotow());
             Ekwipunek.setItems(sledzEq);
+
+            Ilosc.setEditable(true);
+            Ilosc.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+
+            Ilosc.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Item, Integer>>() {
+                @Override
+                public void handle(TableColumn.CellEditEvent<Item, Integer> itemIntegerCellEditEvent) {
+                    itemIntegerCellEditEvent.getRowValue().setAmount(itemIntegerCellEditEvent.getNewValue());
+                }
+            });
+            Wartosc.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+            Wartosc.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Item, Integer>>() {
+                @Override
+                public void handle(TableColumn.CellEditEvent<Item, Integer> itemIntegerCellEditEvent) {
+                    itemIntegerCellEditEvent.getRowValue().setAmount(itemIntegerCellEditEvent.getNewValue());
+                }
+            });
             Przedmiot.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, String>, ObservableValue<String>>() {
                 @Override
                 public ObservableValue<String> call(TableColumn.CellDataFeatures<Item, String> cellDataFeatures) {
@@ -418,23 +441,24 @@ public class MainWinController {
                     }
                 }
             });*/
-            Ilosc.setEditable(true);
-            Ilosc.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
 
-            Ilosc.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Item, Integer>>() {
-                @Override
-                public void handle(TableColumn.CellEditEvent<Item, Integer> itemIntegerCellEditEvent) {
-                    itemIntegerCellEditEvent.getRowValue().setAmount(itemIntegerCellEditEvent.getNewValue());
-                }
-            });
-            Wartosc.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-            Wartosc.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Item, Integer>>() {
-                @Override
-                public void handle(TableColumn.CellEditEvent<Item, Integer> itemIntegerCellEditEvent) {
-                    itemIntegerCellEditEvent.getRowValue().setAmount(itemIntegerCellEditEvent.getNewValue());
-                }
-            });
         }
+
+
+    }
+
+    public void ShowQuestsForCharacter(ActionEvent actionEvent) {
+        MainClassWin.setVisible(false);
+        MainClassWin.setDisable(true);
+        QuestsForCharacter.setVisible(true);
+        QuestsForCharacter.setDisable(false);
+    }
+
+    public void ReturnToCharPrev(ActionEvent e){
+        QuestsForCharacter.setDisable(true);
+        QuestsForCharacter.setVisible(false);
+        MainClassWin.setVisible(true);
+        MainClassWin.setDisable(false);
     }
     //
     //
@@ -462,15 +486,25 @@ public class MainWinController {
     @FXML
     private TableView ListaMisji;
     @FXML
-    private TableView ListaPrzedmiotow;
+    public TableColumn RodzajMisji;
+    @FXML
+    public TableColumn NazwaMisji;
+    @FXML
+    public TableView ListaPrzedmiotow;
+    @FXML
+    public TableColumn NazwaDropu;
+    @FXML
+    public TableColumn PrzecIlosc;
 
     @FXML
     private void InitiateDungeonView(){
         try {
-            DungeonSQLMediator.loadDungeonList(baza.drzewoPlansz, sqlboss);
-            if(ListaPlansz.getRoot()==null)
+            DungeonSQLMediator.loadDungeonList(baza.drzewoPlansz, baza);
+            if(ListaPlansz.getRoot()==null) {
                 InitiateTreeView();
-            //import data of first dungeon
+                //import data of first dungeon
+
+            }
         }
         catch(SQLException e){
             System.err.println("Literówka");
@@ -502,18 +536,54 @@ public class MainWinController {
                     BaseEXPValue.setText(String.valueOf(plansza.getBaseEXP()));
                     BaseEDValue.setText(String.valueOf(plansza.getBaseED()));
                     MinCP.setText(String.valueOf(plansza.getMinCP()));
+                    if(plansza.getTablicaDropow().getDropy().isEmpty())
+                        plansza.inicjujTabliceDropow();
+                    InitiateQuestPrev(plansza);
+                    InitiateItemPrev(plansza);
                 }
             }
         });
     }
 
     private void InitiateQuestPrev(Dungeon dungeon){
+        ListaMisji.setItems(FXCollections.observableArrayList(dungeon.getTablicaZadan().getQuestTable()));
+        RodzajMisji.setCellValueFactory(new Callback<TableColumn.CellDataFeatures, ObservableValue>() {
+            @Override
+            public ObservableValue call(TableColumn.CellDataFeatures cellDataFeatures) {
+                Quest zad = (Quest)cellDataFeatures.getValue();
+                return new ReadOnlyObjectWrapper(zad.getCompletionType());
+            }
+        });
+
+        NazwaMisji.setCellValueFactory(new Callback<TableColumn.CellDataFeatures, ObservableValue>() {
+            @Override
+            public ObservableValue call(TableColumn.CellDataFeatures cellDataFeatures) {
+                Quest zad = (Quest)cellDataFeatures.getValue();
+                return new ReadOnlyObjectWrapper(zad.getQuestName());
+            }
+        });
 
     }
 
     private void InitiateItemPrev(Dungeon dungeon){
+        ListaPrzedmiotow.setItems(FXCollections.observableArrayList(dungeon.getTablicaDropow().getDropy()));
+        NazwaDropu.setCellValueFactory(new Callback<TableColumn.CellDataFeatures, ObservableValue>() {
+            @Override
+            public ObservableValue call(TableColumn.CellDataFeatures cellDataFeatures) {
+                Item drop = (Item)cellDataFeatures.getValue();
+                return new ReadOnlyObjectWrapper(drop.getName().getValue());
+            }
+        });
 
+        PrzecIlosc.setCellValueFactory(new Callback<TableColumn.CellDataFeatures, ObservableValue>() {
+            @Override
+            public ObservableValue call(TableColumn.CellDataFeatures cellDataFeatures) {
+                Item drop = (Item) cellDataFeatures.getValue();
+                return new ReadOnlyObjectWrapper(drop.getRate().getValue());
+            }
+        });
     }
+
 
 
 }

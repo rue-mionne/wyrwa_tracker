@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
@@ -31,7 +33,24 @@
                                        <children>
                                           <Separator layoutX="366.0" orientation="VERTICAL" prefHeight="376.0" prefWidth="4.0" />
                                           <ListView fx:id="CharacterList" layoutX="366.0" onMouseClicked="#WybierzPostac" prefHeight="345.0" prefWidth="200.0" />
-                                          <ScrollPane prefHeight="371.0" prefWidth="365.0">
+                                          <ScrollPane fx:id="QuestsForCharacter" disable="true" prefHeight="367.0" prefWidth="365.0" visible="false">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="369.0" prefWidth="358.0">
+                                                   <children>
+                                                      <ChoiceBox fx:id="QuestTypeChoice" layoutX="14.0" layoutY="49.0" prefWidth="150.0" />
+                                                      <ChoiceBox fx:id="RegionChoice" layoutX="14.0" layoutY="14.0" prefWidth="150.0" />
+                                                      <TableView editable="true" layoutX="14.0" layoutY="85.0" prefHeight="257.0" prefWidth="312.0">
+                                                        <columns>
+                                                          <TableColumn fx:id="QuestNameChar" editable="false" prefWidth="161.0" text="Nazwa Zadania" />
+                                                          <TableColumn fx:id="CompletionCountChar" prefWidth="150.0" text="Ile Razy Ukończone" />
+                                                        </columns>
+                                                      </TableView>
+                                                      <Button fx:id="QuestForCharReturn" layoutX="282.0" layoutY="14.0" mnemonicParsing="false" onAction="#ReturnToCharPrev" text="Powrót" />
+                                                   </children>
+                                                </AnchorPane>
+                                            </content>
+                                          </ScrollPane>
+                                          <ScrollPane fx:id="MainClassWin" prefHeight="371.0" prefWidth="365.0">
                                             <content>
                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="457.0" prefWidth="356.0">
                                                    <children>
@@ -42,7 +61,7 @@
                                                       <Label fx:id="EstCP" layoutX="85.0" layoutY="79.0" text="Szac. CP:" />
                                                       <TextField fx:id="EstCPField" editable="false" layoutX="156.0" layoutY="75.0" onMouseClicked="#EnableEstCPEdit" />
                                                       <Label layoutX="17.0" layoutY="237.0" text="Ekwipunek" />
-                                                      <TableView fx:id="Ekwipunek" layoutX="17.0" layoutY="253.0" prefHeight="197.0" prefWidth="323.0">
+                                                      <TableView fx:id="Ekwipunek" editable="true" layoutX="17.0" layoutY="253.0" prefHeight="197.0" prefWidth="323.0">
                                                         <columns>
                                                           <TableColumn fx:id="Przedmiot" editable="false" prefWidth="184.0" text="Przedmiot" />
                                                           <TableColumn fx:id="Ilosc" prefWidth="58.0" text="Ilość" />
@@ -59,6 +78,7 @@
                                                       <TextField fx:id="IDMultipField" editable="false" layoutX="156.0" layoutY="167.0" onMouseClicked="#EnableIDMultipEdit" />
                                                       <Button fx:id="AddConfigButton" layoutX="311.0" layoutY="205.0" mnemonicParsing="false" onAction="#AddBuildConfig" prefHeight="24.0" prefWidth="8.0" text="+" />
                                                       <ChoiceBox fx:id="ClassNameField" layoutX="158.0" layoutY="45.0" prefHeight="24.0" prefWidth="168.0" />
+                                                      <Button fx:id="QuestInterfaceButton" layoutX="6.0" layoutY="103.0" mnemonicParsing="false" onAction="#ShowQuestsForCharacter" prefHeight="69.0" prefWidth="77.0" text="Zadania" />
                                                    </children>
                                                 </AnchorPane>
                                             </content>
@@ -85,20 +105,51 @@
                                           <Label layoutX="14.0" layoutY="120.0" text="Lista misji:" />
                                           <TableView fx:id="ListaMisji" layoutX="14.0" layoutY="136.0" prefHeight="235.0" prefWidth="183.0">
                                             <columns>
-                                              <TableColumn prefWidth="75.0" text="Rodzaj:" />
-                                              <TableColumn prefWidth="107.0" text="Postać:" />
+                                              <TableColumn fx:id="NazwaMisji" prefWidth="107.0" text="Nazwa:" />
+                                              <TableColumn fx:id="RodzajMisji" prefWidth="75.0" text="Rodzaj:" />
                                             </columns>
                                           </TableView>
                                           <TableView fx:id="ListaPrzedmiotow" layoutX="197.0" layoutY="136.0" prefHeight="235.0" prefWidth="190.0">
                                             <columns>
-                                              <TableColumn prefWidth="92.0" text="Nazwa:" />
-                                              <TableColumn prefWidth="96.0" text="Ilość na run:" />
+                                              <TableColumn fx:id="NazwaDropu" prefWidth="92.0" text="Nazwa:" />
+                                              <TableColumn fx:id="PrzecIlosc" prefWidth="96.0" text="Ilość na run:" />
                                             </columns>
                                           </TableView>
                                           <Label layoutX="197.0" layoutY="120.0" text="Lista przedmiotów:" />
                                        </children></AnchorPane>
                               </content>
                             </Tab>
+                              <Tab fx:id="ZadaniaTab" text="Zadania">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TreeView fx:id="ZadaniaRegiony" prefHeight="370.0" prefWidth="191.0" />
+                                          <ListView fx:id="ZadaniaNagrody" layoutX="202.0" layoutY="40.0" prefHeight="331.0" prefWidth="186.0" />
+                                          <ListView fx:id="ZadaniaPostaciActive" layoutX="388.0" layoutY="39.0" prefHeight="332.0" prefWidth="181.0" />
+                                          <Label layoutX="202.0" layoutY="14.0" text="Nagrody:" />
+                                          <Label layoutX="388.0" layoutY="14.0" text="Aktywne dla:" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
+                              <Tab fx:id="PrzedmiotyTab" text="Przedmioty">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <ComboBox editable="true" layoutX="26.0" layoutY="39.0" prefWidth="150.0" />
+                                          <Label layoutX="26.0" layoutY="14.0" text="Nazwa przedmiotu:" />
+                                          <ListView fx:id="ListaEkwipunkow" layoutX="317.0" layoutY="72.0" prefHeight="284.0" prefWidth="230.0" />
+                                          <Label layoutX="26.0" layoutY="78.0" text="Wartość:" />
+                                          <Label layoutX="26.0" layoutY="101.0" text="Sprzedaż:" />
+                                          <Label layoutX="26.0" layoutY="123.0" text="Przenoszenie:" />
+                                          <Label layoutX="317.0" layoutY="55.0" text="Lista ekwipunków:" />
+                                          <TextField fx:id="WartoscPrzedmiotu" layoutX="91.0" layoutY="74.0" />
+                                          <CheckBox fx:id="CheckSellable" disable="true" layoutX="101.0" layoutY="100.0" mnemonicParsing="false" />
+                                          <CheckBox fx:id="CheckShareable" disable="true" layoutX="119.0" layoutY="122.0" mnemonicParsing="false" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
                           </tabs>
                         </TabPane>
                      </children>
@@ -110,6 +161,11 @@
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
           </Tab>
+            <Tab text="Analiza">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              </content>
+            </Tab>
         </tabs>
       </TabPane>
    </children>

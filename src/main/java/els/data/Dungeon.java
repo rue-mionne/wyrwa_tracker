@@ -15,7 +15,21 @@ public class Dungeon {
     Integer BaseEXP;
     Integer MinCP;
 
-    public Dungeon(String name){this.name=name;}
+    QuestTable tablicaZadan = new QuestTable();
+
+    public DropTable getTablicaDropow() {
+        return tablicaDropow;
+    }
+
+    public void inicjujTabliceDropow() {
+        tablicaDropow.fillDropList(tablicaZadan);
+    }
+
+    DropTable tablicaDropow = new DropTable();
+
+    public Dungeon(String name){
+        this.name=name;
+    }
 
     public Integer getBaseED() {
         return BaseED;
@@ -43,5 +57,13 @@ public class Dungeon {
 
     public String getName(){
         return name;
+    }
+
+    public QuestTable getTablicaZadan() {
+        return tablicaZadan;
+    }
+
+    public void setTablicaZadan(QuestTable tablicaZadan) {
+        this.tablicaZadan = tablicaZadan;
     }
 }

@@ -1,15 +1,13 @@
 package els.data;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 
 public class Item implements Cloneable {
     int ID;
     StringProperty Name;
     IntegerProperty Amount;
+    FloatProperty Rate;
     IntegerProperty SalePrice;
     boolean Sellable;
     boolean Shareable;
@@ -23,6 +21,7 @@ public class Item implements Cloneable {
         Name = new SimpleStringProperty(name);
         Amount = new SimpleIntegerProperty(amount);
         SalePrice = new SimpleIntegerProperty(salePrice);
+        Rate = new SimpleFloatProperty(amount);
         Sellable = sellable;
         Shareable = shareable;
     }
@@ -66,6 +65,13 @@ public class Item implements Cloneable {
 
     public void setShareable(boolean shareable) {
         Shareable = shareable;
+    }
+
+    public void setRate(Float newRate){
+        Rate.setValue(newRate);
+    }
+    public FloatProperty getRate(){
+        return Rate;
     }
 
     public Item clone() throws CloneNotSupportedException{
