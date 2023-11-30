@@ -3,6 +3,7 @@ package els.wyrwatracker;
 import els.data.Postac;
 import els.sqliteIO.NoActiveConnectionException;
 import els.sqliteIO.SQLiteConnector;
+import els.surgeons.CharacterSurgeon;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -40,7 +41,7 @@ public class MainWinController {
 
     SQLiteConnector sqlboss;
 
-    EnumSet<Postac.SaveFlags> flagiZapisu;
+
     ObservableList<String> olistBuilds;
     @FXML
     private Tab PostaciTab;
@@ -195,7 +196,6 @@ public class MainWinController {
     }
 
     void ZaladujPostac(Postac postac){
-        flagiZapisu = EnumSet.of(Postac.SaveFlags.IGN);
         ConfigChoice.getSelectionModel().clearSelection();
         CharacterNameField.setText(postac.getIGN());
         ClassNameField.getSelectionModel().select(postac.getClassName());
@@ -248,8 +248,6 @@ public class MainWinController {
                     Postac postac = konto.PobierzPostac(staraNazwaPostaci);
                     postac.setIGN(newval);
                     CharacterList.getItems().set((postac.getID() - 1), newval);
-                    if(newval!=null)
-                        flagiZapisu.add(Postac.SaveFlags.IGN);
                 }
             }
         });
@@ -259,8 +257,6 @@ public class MainWinController {
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                 Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
                 postac.setClassName(t1);
-                if(t1!=null)
-                    flagiZapisu.add(Postac.SaveFlags.ClassName);
             }
         });
 
@@ -271,8 +267,6 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(EstCPField))
                     build.EstCP= Integer.parseInt(newval);
-                if(newval!=null)
-                    flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
 
@@ -283,8 +277,6 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(EDMultipField))
                     build.EDMultip= Integer.parseInt(newval);
-                if(newval!=null)
-                    flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
 
@@ -295,8 +287,6 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(IDMultipField))
                     build.IDMultip= Integer.parseInt(newval);
-                if(newval!=null)
-                    flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
 
@@ -307,8 +297,6 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(EDMultipField))
                     build.EDMultip= Integer.parseInt(newval);
-                if(newval!=null)
-                        flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
         EXPMultipField.textProperty().addListener(new ChangeListener<String>() {
@@ -318,8 +306,6 @@ public class MainWinController {
                 Build build = postac.PobierzBuild(ConfigChoice.getValue());
                 if(build!=null&&checkIfDigitAndCorrect(EXPMultipField))
                     build.EXPMultip= Integer.parseInt(newval);
-                if(newval!=null)
-                        flagiZapisu.add(Postac.SaveFlags.BuildSet);
             }
         });
 
@@ -330,8 +316,6 @@ public class MainWinController {
                    if(newval!= postac.getClassName()&&newval!=null){
                        postac.setClassName(ClassNameField.getValue());
                    }
-                   if(newval!=null)
-                       flagiZapisu.add(Postac.SaveFlags.ClassName);
                }
             }
         );
@@ -350,13 +334,17 @@ public class MainWinController {
         }
     }
 
-    public void AddCharacter(ActionEvent actionEvent) {
+    public void AddCharacter(ActionEvent actionEvent) throws NoActiveConnectionException,SQLException{
         Optional<String> wynik = new GiveNameDialog("postaci:").showAndWait();
         if(wynik.isPresent()){
             Postac postac = konto.DodajPostac(new Postac());
             postac.setIGN(wynik.get());
             CharacterList.getItems().add(wynik.get());
+            CharacterSurgeon chirurgTestowy = new CharacterSurgeon(baza);
+            chirurgTestowy.scheduleInsert(postac);
+            chirurgTestowy.proceed();
         }
+
     }
     private void InitiateClassChoice() throws NoActiveConnectionException, SQLException{
         if(ClassNameField.getSelectionModel().getSelectedItem()!=null){
@@ -499,7 +487,8 @@ public class MainWinController {
     @FXML
     private void InitiateDungeonView(){
         try {
-            DungeonSQLMediator.loadDungeonList(baza.drzewoPlansz, baza);
+            if(baza.drzewoPlansz.getListaRegionow().isEmpty())
+                DungeonSQLMediator.loadDungeonList(baza.drzewoPlansz, baza);
             if(ListaPlansz.getRoot()==null) {
                 InitiateTreeView();
                 //import data of first dungeon
@@ -584,8 +573,72 @@ public class MainWinController {
         });
     }
 
+    //
+    //
+    ////
+    ////Zadania Tab
+    ////
+    //
+    //
 
+    @FXML
+    TreeView<String> ZadaniaRegiony;
+    @FXML
+    ListView<String> ZadaniaNagrody;
+    @FXML
+    ListView<String> ZadaniaPostaciActive;
 
+    public void InitiateZadaniaView(){
+        try {
+            if (baza.drzewoPlansz.getListaRegionow().isEmpty())
+                DungeonSQLMediator.loadDungeonList(baza.drzewoPlansz, baza);
+                QuestSQLMediator.loadAllQuestData(baza.bazaZadan,sqlboss);
+            if (ZadaniaRegiony.getRoot() == null)
+                InitiateTreeViewZadania();
+        }
+        catch(NoActiveConnectionException e){
+            System.out.println("Zadania no con");
+        }
+        catch(SQLException e){
+            System.out.println("Wywaliło SQL: zadania tab");
+        }
+    }
+
+    public void InitiateTreeViewZadania() throws SQLException,NoActiveConnectionException{
+        TreeItem<String> root = new TreeItem<String>("Regiony");
+        root.setExpanded(true);
+        for(Region region : baza.drzewoPlansz.getListaRegionow()){
+            TreeItem<String> newRegion = new TreeItem<String>(region.getName());
+            root.getChildren().add(newRegion);
+            for(String plansza : region.getDungeonList()){
+                TreeItem<String> newplansza = new TreeItem<String>(plansza);
+                newRegion.getChildren().add(newplansza);
+                Dungeon dung = region.getDungeon(plansza);
+                if(dung.getTablicaZadan().getQuestTable().isEmpty()){
+                    DungeonSQLMediator.getQuestData(dung,baza);
+                }
+                for(Quest zadanie:dung.getTablicaZadan().getQuestTable()){
+                    newplansza.getChildren().add(new TreeItem<String>(zadanie.getQuestName()));
+                }
+            }
+
+        }
+        ZadaniaRegiony.setRoot(root);
+        ZadaniaRegiony.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<String>>() {
+            @Override
+            public void changed(ObservableValue<? extends TreeItem<String>> observableValue, TreeItem<String> stringTreeItem, TreeItem<String> t1) {
+
+            }
+        });
+    }
+
+    //
+    //
+    ////
+    ////Przedmioty Tab
+    ////
+    //
+    //
 }
 
 

@@ -119,15 +119,16 @@
                                        </children></AnchorPane>
                               </content>
                             </Tab>
-                              <Tab fx:id="ZadaniaTab" text="Zadania">
+                              <Tab fx:id="ZadaniaTab" onSelectionChanged="#InitiateZadaniaView" text="Zadania">
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TreeView fx:id="ZadaniaRegiony" prefHeight="370.0" prefWidth="191.0" />
+                                          <TreeView fx:id="ZadaniaRegiony" prefHeight="340.0" prefWidth="191.0" />
                                           <ListView fx:id="ZadaniaNagrody" layoutX="202.0" layoutY="40.0" prefHeight="331.0" prefWidth="186.0" />
                                           <ListView fx:id="ZadaniaPostaciActive" layoutX="388.0" layoutY="39.0" prefHeight="332.0" prefWidth="181.0" />
                                           <Label layoutX="202.0" layoutY="14.0" text="Nagrody:" />
                                           <Label layoutX="388.0" layoutY="14.0" text="Aktywne dla:" />
+                                          <ChoiceBox fx:id="QuestFiltr" layoutX="14.0" layoutY="340.0" prefHeight="24.0" prefWidth="166.0" />
                                        </children>
                                     </AnchorPane>
                                 </content>

@@ -143,6 +143,7 @@ public class ControllerMain {
         }
         catch(SQLException e){
             System.err.println("Umiesz w SQL?");
+            System.err.println(e.getMessage());
         }
     }
 }

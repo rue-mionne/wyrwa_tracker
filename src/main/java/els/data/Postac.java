@@ -14,8 +14,6 @@ public class Postac {
     BuildSet BuildSetData = new BuildSet();
     Inventory ekwipunek = new Inventory();
 
-    public SaveFlags flagiZapisu;
-
     public Postac() {
     }
 
@@ -93,9 +91,9 @@ public class Postac {
     public ArrayList<String> PobierzListeBuildow(){
         return BuildSetData.getSetNameList();
     }
-
+/*
     public enum SaveFlags{IGN, ClassName, BuildSet, Eq;
         public static final EnumSet<SaveFlags> ALL_UPT = EnumSet.allOf(SaveFlags.class);
     }
-
+*/
 }

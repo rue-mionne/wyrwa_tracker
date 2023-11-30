@@ -12,7 +12,7 @@ public class CharacterSQLMediator {
     public static Postac ReadCharacter(int CharacterID, SQLiteConnector connector) throws NoActiveConnectionException, SQLException {
         Connection polaczenie = connector.getActiveConnection();
         Statement query = polaczenie.createStatement();
-        ResultSet rs = query.executeQuery("Select * from Characters inner join Classes on Characters.ClassID=Classes.ClassID WHERE ID=" + CharacterID +";");
+        ResultSet rs = query.executeQuery("Select * from Characters left join Classes on Characters.ClassID=Classes.ClassID WHERE ID=" + CharacterID +";");
         Postac postac = new Postac(rs.getInt("ID"),rs.getString("Name"), rs.getString("CharacterName"), rs.getString("ClassName"), rs.getString("ShortClassName"), rs.getFloat("DPSRating"));
         return postac;
     }
