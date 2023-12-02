@@ -4,6 +4,7 @@ import els.data.Postac;
 import els.sqliteIO.NoActiveConnectionException;
 import els.sqliteIO.SQLiteConnector;
 import els.surgeons.CharacterSurgeon;
+import els.surgeons.ISurgeon;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -15,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -108,6 +110,9 @@ public class MainWinController {
     private Database baza;
     private Account konto;
 
+    ArrayList<ISurgeon> listaChirurgow = new ArrayList<>();
+    CharacterSurgeon chirurgTestowy;
+
     @FXML
     private ScrollPane MainClassWin;
     @FXML
@@ -165,12 +170,36 @@ public class MainWinController {
         }
     }
 
-    public void PostaciLoadUnload(Event event) {
+    public void PostaciLoadUnload(Event event) throws NoActiveConnectionException, SQLException{
         if(konto!=null){
             if(PostaciTab.isSelected()&&!konto.pobierzListePostaci().isEmpty()){
                 ObservableList<String> olistPostaci = FXCollections.observableArrayList(konto.pobierzListePostaci());
                 CharacterList.setItems(olistPostaci);
                 CharacterList.getSelectionModel().select(0);
+                CharacterList.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+                    @Override
+                    public void handle(KeyEvent keyEvent) {
+                        if(keyEvent.getCode()==KeyCode.DELETE){
+                            Postac postac=konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
+                            konto.pobierzListePostaci().remove(postac);
+                            CharacterList.getItems().remove(CharacterList.getSelectionModel().getSelectedItem());
+                            chirurgTestowy.scheduleDelete(postac);
+
+                            CharacterList.getSelectionModel().select(0);
+                            try {
+                                ZaladujPostac(konto.PobierzPostac(0));
+                            }
+                            catch(SQLException e){
+
+                            }
+                            catch(NoActiveConnectionException e){
+
+                            }
+                        }
+                    }
+                });
+                chirurgTestowy = new CharacterSurgeon(baza);
+                listaChirurgow.add(chirurgTestowy);
                 ZaladujPostac(konto.PobierzPostac(0));
                 ConfigChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
                     @Override
@@ -179,9 +208,15 @@ public class MainWinController {
                     }
                 }) ;
                 InicjujHandleryPol();
+
             }
 
         }
+
+            if(!PostaciTab.isSelected()){
+                chirurgTestowy.proceed();
+            }
+
     }
 
     void ZaładujBuild(String nazwaBuildu){
@@ -195,7 +230,7 @@ public class MainWinController {
         }
     }
 
-    void ZaladujPostac(Postac postac){
+    void ZaladujPostac(Postac postac) throws NoActiveConnectionException, SQLException{
         ConfigChoice.getSelectionModel().clearSelection();
         CharacterNameField.setText(postac.getIGN());
         ClassNameField.getSelectionModel().select(postac.getClassName());
@@ -229,16 +264,16 @@ public class MainWinController {
             IDMultipField.setText("0");
             ConfigChoice.getItems().clear();
         }
-
+        chirurgTestowy.scheduleUpdate(postac);
 
     }
 
-    public void WybierzPostac(MouseEvent mouseEvent) {
+    public void WybierzPostac(MouseEvent mouseEvent) throws NoActiveConnectionException, SQLException{
         String nazwaPostaci = CharacterList.getSelectionModel().getSelectedItem();
         ZaladujPostac(konto.PobierzPostac(nazwaPostaci));
     }
 
-    public void InicjujHandleryPol(){
+    public void InicjujHandleryPol() {
 
         CharacterNameField.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -248,6 +283,7 @@ public class MainWinController {
                     Postac postac = konto.PobierzPostac(staraNazwaPostaci);
                     postac.setIGN(newval);
                     CharacterList.getItems().set((postac.getID() - 1), newval);
+
                 }
             }
         });
@@ -340,7 +376,6 @@ public class MainWinController {
             Postac postac = konto.DodajPostac(new Postac());
             postac.setIGN(wynik.get());
             CharacterList.getItems().add(wynik.get());
-            CharacterSurgeon chirurgTestowy = new CharacterSurgeon(baza);
             chirurgTestowy.scheduleInsert(postac);
             chirurgTestowy.proceed();
         }
@@ -639,6 +674,13 @@ public class MainWinController {
     ////
     //
     //
+
+
+    public ArrayList<ISurgeon> getListaChirurgow() {
+        return listaChirurgow;
+    }
+
+
 }
 
 

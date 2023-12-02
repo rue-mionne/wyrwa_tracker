@@ -1,6 +1,6 @@
 package els.surgeons;
 
 public interface IDeleteSurgeon extends ISurgeon {
-    void scheduleDelete();
+    void scheduleDelete(Object deleted);
     void reverseChanges();
 }

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 public class Postac {
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
     int ID;
     String IGN;
     String CharacterName;

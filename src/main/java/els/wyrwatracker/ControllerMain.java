@@ -22,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 public class ControllerMain {
     ServerListHandler serverList= null;
     ServerListHandler serverTemplateList = null;
+
+    MainWinController dzieciak;
 
     static Stage parent;
     @FXML
@@ -130,10 +133,29 @@ public class ControllerMain {
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("MainWin.fxml"));
             Scene scena2 = new Scene(fxmlLoader.load(), 700,400);
             parent.setScene(scena2);
-            MainWinController dzieciak = (MainWinController) fxmlLoader.getController();
+            dzieciak = (MainWinController) fxmlLoader.getController();
             dzieciak.OdbierzSQLHandler(sqlHandler);
             dzieciak.OdbierzBaze(baza);
             dzieciak.PostaciLoadUnload(new Event(new EventType<>()));
+
+            Window win = scena2.getWindow();
+            win.setOnCloseRequest(event -> {
+
+                    dzieciak.getListaChirurgow().forEach(chirurg ->{ try{
+                        chirurg.proceed();
+                    }
+                    catch(NoActiveConnectionException e){
+                        System.err.println("Połączenie uciekło...");
+                        System.err.println(e.getMessage());
+                    }
+                    catch(SQLException e){
+                        System.err.println("Polecenie padło przy zapisie");
+                        System.err.println(e.getMessage());
+                    }
+                    });
+
+            });
+
         }
         catch(IOException e){
             System.err.println("Hurrrr");
@@ -146,4 +168,6 @@ public class ControllerMain {
             System.err.println(e.getMessage());
         }
     }
+
+
 }
