@@ -18,4 +18,13 @@ public class QuestDatabase {
         }
         return bazaZadan.get(ID);
     }
+
+    public Quest getQuest(String name){
+        for(Quest zadanie:bazaZadan.values()){
+            if(zadanie.getQuestName().equals(name)){
+                return zadanie;
+            }
+        }
+        return null;
+    }
 }

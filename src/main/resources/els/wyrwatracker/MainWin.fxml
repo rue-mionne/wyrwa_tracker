@@ -39,7 +39,7 @@
                                                    <children>
                                                       <ChoiceBox fx:id="QuestTypeChoice" layoutX="14.0" layoutY="49.0" prefWidth="150.0" />
                                                       <ChoiceBox fx:id="RegionChoice" layoutX="14.0" layoutY="14.0" prefWidth="150.0" />
-                                                      <TableView editable="true" layoutX="14.0" layoutY="85.0" prefHeight="257.0" prefWidth="312.0">
+                                                      <TableView fx:id="ShowCharQuest" editable="true" layoutX="14.0" layoutY="85.0" prefHeight="257.0" prefWidth="312.0">
                                                         <columns>
                                                           <TableColumn fx:id="QuestNameChar" editable="false" prefWidth="161.0" text="Nazwa Zadania" />
                                                           <TableColumn fx:id="CompletionCountChar" prefWidth="150.0" text="Ile Razy Ukończone" />

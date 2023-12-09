@@ -32,4 +32,8 @@ public class BuildSet {
         }
         return null;
     }
+
+    public ArrayList<Build> getBuildSetList() {
+        return BuildSetList;
+    }
 }

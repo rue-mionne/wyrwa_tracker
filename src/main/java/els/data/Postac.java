@@ -19,6 +19,7 @@ public class Postac {
     Inventory ekwipunek = new Inventory();
 
     public Postac() {
+        ekwipunek.setOwner(this);
     }
 
     public int getID(){
@@ -32,6 +33,7 @@ public class Postac {
         ClassName = className;
         ShortClassName = shortClassName;
         this.DPSRating = DPSRating;
+        ekwipunek.setOwner(this);
     }
 
     public void DodajPrzedmiot(Item przedmiot){

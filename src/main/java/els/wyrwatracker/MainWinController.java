@@ -3,15 +3,16 @@ package els.wyrwatracker;
 import els.data.Postac;
 import els.sqliteIO.NoActiveConnectionException;
 import els.sqliteIO.SQLiteConnector;
-import els.surgeons.CharacterSurgeon;
-import els.surgeons.ISurgeon;
+import els.surgeons.*;
 import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -112,6 +113,7 @@ public class MainWinController {
 
     ArrayList<ISurgeon> listaChirurgow = new ArrayList<>();
     CharacterSurgeon chirurgTestowy;
+    QuestGenerator questGenerator;
 
     @FXML
     private ScrollPane MainClassWin;
@@ -145,9 +147,6 @@ public class MainWinController {
 
     @FXML
     public void initialize(){
-
-
-
     }
 
     public void OdbierzSQLHandler(SQLiteConnector SQLConnector){
@@ -165,8 +164,23 @@ public class MainWinController {
         Optional<String> wynik = new GiveNameDialog("konfiguracji").showAndWait();
         if(wynik.isPresent()) {
             String nazwaBuildu = wynik.get();
-            postac.PobierzDaneBuildow().AddNewBuildSet(new Build(nazwaBuildu, 0, 0, 0, 0));
+            Build build = new Build(nazwaBuildu, 0, 0, 0, 0, postac.getID());
+            postac.PobierzDaneBuildow().AddNewBuildSet(build);
             olistBuilds.add(nazwaBuildu);
+            ConfigChoice.setItems(olistBuilds);
+            BuildSurgeon chirurg= new BuildSurgeon(baza);
+            try {
+                chirurg.scheduleInsert(build);
+                chirurg.proceed();
+            }
+            catch(NoActiveConnectionException e){
+
+            }
+            catch(SQLException e){
+                System.err.println(".....");
+                System.err.println(e.getMessage());
+            }
+            ConfigChoice.getSelectionModel().selectLast();
         }
     }
 
@@ -179,7 +193,7 @@ public class MainWinController {
                 CharacterList.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
                     @Override
                     public void handle(KeyEvent keyEvent) {
-                        if(keyEvent.getCode()==KeyCode.DELETE){
+                        if(keyEvent.getCode()==KeyCode.DELETE&&!CharacterList.getSelectionModel().getSelectedItem().equals("Account")){
                             Postac postac=konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
                             konto.pobierzListePostaci().remove(postac);
                             CharacterList.getItems().remove(CharacterList.getSelectionModel().getSelectedItem());
@@ -201,6 +215,16 @@ public class MainWinController {
                 chirurgTestowy = new CharacterSurgeon(baza);
                 listaChirurgow.add(chirurgTestowy);
                 ZaladujPostac(konto.PobierzPostac(0));
+
+                try {
+                    questGenerator = new QuestGenerator(baza);
+                }
+                catch(NoActiveConnectionException e){
+                    System.err.println(e.getMessage());
+                }
+                catch(SQLException e){
+                    System.err.println(e.getMessage());
+                }
                 ConfigChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
                     @Override
                     public void changed(ObservableValue<? extends String> observableValue, String number, String t1) {
@@ -208,7 +232,7 @@ public class MainWinController {
                     }
                 }) ;
                 InicjujHandleryPol();
-
+                InitiateQuestForChar();
             }
 
         }
@@ -258,6 +282,7 @@ public class MainWinController {
             }
         }
         else{
+            olistBuilds = FXCollections.observableArrayList(listaBuildow);
             EstCPField.setText("0");
             EDMultipField.setText("0");
             EXPMultipField.setText("0");
@@ -271,6 +296,7 @@ public class MainWinController {
     public void WybierzPostac(MouseEvent mouseEvent) throws NoActiveConnectionException, SQLException{
         String nazwaPostaci = CharacterList.getSelectionModel().getSelectedItem();
         ZaladujPostac(konto.PobierzPostac(nazwaPostaci));
+        FillCharQuestsTab();
     }
 
     public void InicjujHandleryPol() {
@@ -288,13 +314,13 @@ public class MainWinController {
             }
         });
 
-        ClassNameField.valueProperty().addListener(new ChangeListener<String>() {
+        /*ClassNameField.valueProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                 Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
                 postac.setClassName(t1);
             }
-        });
+        });*/
 
         EstCPField.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -349,8 +375,28 @@ public class MainWinController {
                @Override
                public void changed(ObservableValue<? extends String> observableValue, String old, String newval) {
                    Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
-                   if(newval!= postac.getClassName()&&newval!=null){
+                   if(newval!= postac.getClassName()&&newval!=null) {
                        postac.setClassName(ClassNameField.getValue());
+                       try {
+                          String polecenie ="Select NameTable.CharacterName from NameTable left join Classes on Classes.CharacterName=NameTable.ID WHERE Classes.ClassName like '"+ClassNameField.getValue()+"';";
+                          Connection con = sqlboss.getActiveConnection();
+                          Statement query = con.createStatement();
+                          ResultSet rs = query.executeQuery(polecenie);
+                           String charname = rs.getString("CharacterName");
+                           postac.setCharacterName(charname);
+
+                           if (old == null) {
+                               ClassNameField.getItems().clear();
+                               ClassNameField.getSelectionModel().select(newval);
+
+                               questGenerator.scheduleInsert(postac);
+                           }} catch(NoActiveConnectionException e){
+
+                           } catch(SQLException e){
+                               System.err.println(e.getMessage());
+
+                           }
+
                    }
                }
             }
@@ -378,6 +424,7 @@ public class MainWinController {
             CharacterList.getItems().add(wynik.get());
             chirurgTestowy.scheduleInsert(postac);
             chirurgTestowy.proceed();
+            questGenerator.scheduleInsert(postac);
         }
 
     }
@@ -421,13 +468,15 @@ public class MainWinController {
                 @Override
                 public void handle(TableColumn.CellEditEvent<Item, Integer> itemIntegerCellEditEvent) {
                     itemIntegerCellEditEvent.getRowValue().setAmount(itemIntegerCellEditEvent.getNewValue());
+                    ekwipunek.getEditModeList().set(ekwipunek.getListaPrzedmiotow().indexOf(itemIntegerCellEditEvent.getRowValue()),1);
                 }
             });
             Wartosc.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
             Wartosc.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Item, Integer>>() {
                 @Override
                 public void handle(TableColumn.CellEditEvent<Item, Integer> itemIntegerCellEditEvent) {
-                    itemIntegerCellEditEvent.getRowValue().setAmount(itemIntegerCellEditEvent.getNewValue());
+                    itemIntegerCellEditEvent.getRowValue().setSalePrice(itemIntegerCellEditEvent.getNewValue());
+                    ekwipunek.getEditModeList().set(ekwipunek.getListaPrzedmiotow().indexOf(itemIntegerCellEditEvent.getRowValue()),1);
                 }
             });
             Przedmiot.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Item, String>, ObservableValue<String>>() {
@@ -482,6 +531,210 @@ public class MainWinController {
         QuestsForCharacter.setVisible(false);
         MainClassWin.setVisible(true);
         MainClassWin.setDisable(false);
+    }
+    @FXML
+    ChoiceBox<String> QuestTypeChoice;
+    @FXML
+    ChoiceBox<String> RegionChoice;
+    @FXML
+    TableView<Quest> ShowCharQuest;
+    @FXML
+    TableColumn<Quest,String> QuestNameChar;
+    @FXML
+    TableColumn<Quest,Integer> CompletionCountChar;
+    ObservableList<Quest> misjePostaci;
+    boolean firstTime=true;
+    public void InitiateQuestForChar() throws NoActiveConnectionException, SQLException{
+        InitiateCharQuestsHandlers();
+        InitiateQuestTypeChoice();
+        InitiateRegionChoice();
+    }
+
+    public void InitiateQuestTypeChoice(){
+        ArrayList<String> choiceList = new ArrayList<>();
+        choiceList.add("Drops");
+        choiceList.add("Daily");
+        choiceList.add("Weekly");
+        choiceList.add("Epic");
+        choiceList.add("All");
+        QuestTypeChoice.setItems(FXCollections.observableArrayList(choiceList));
+        QuestTypeChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                FillCharQuestsTab();
+            }
+        });
+    }
+
+    public void InitiateRegionChoice() throws NoActiveConnectionException, SQLException{
+        Connection con = sqlboss.getActiveConnection();
+        Statement query = con.createStatement();
+        ResultSet rs = query.executeQuery("Select distinct Region from Dungeons");
+        ArrayList<String> choiceList = new ArrayList<>();
+        while(rs.next()) {
+            choiceList.add(rs.getString("Region"));
+        }
+        choiceList.add("All");
+        RegionChoice.getSelectionModel().select("All");
+        RegionChoice.setItems(FXCollections.observableArrayList(choiceList));
+        RegionChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                FillCharQuestsTab();
+            }
+        });
+    }
+
+    public void InitiateCharQuestsHandlers(){
+        ShowCharQuest.setEditable(true);
+        CompletionCountChar.setEditable(true);
+        ArrayList<Quest> tempMisje = new ArrayList<>();
+        misjePostaci = FXCollections.observableArrayList(tempMisje);
+        ShowCharQuest.setItems(misjePostaci);
+        FillCharQuestsTab();
+        QuestNameChar.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Quest, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Quest, String> questStringCellDataFeatures) {
+                return new ReadOnlyObjectWrapper<>(questStringCellDataFeatures.getValue().getQuestName());
+            }
+        });
+
+        CompletionCountChar.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Quest, Integer>, ObservableValue<Integer>>() {
+            @Override
+            public ObservableValue<Integer> call(TableColumn.CellDataFeatures<Quest, Integer> questIntegerCellDataFeatures) {
+                return new ReadOnlyObjectWrapper<>(questIntegerCellDataFeatures.getValue().getCompletionCount());
+            }
+        });
+
+        CompletionCountChar.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        CompletionCountChar.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Quest, Integer>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Quest, Integer> questIntegerCellEditEvent) {
+                Quest edytowane = questIntegerCellEditEvent.getRowValue();
+                if(questIntegerCellEditEvent.getNewValue()> edytowane.getMaxCompletionCount()){
+                    edytowane.setCompletionCount(edytowane.getMaxCompletionCount());
+                }
+                else{
+                    edytowane.setCompletionCount(questIntegerCellEditEvent.getNewValue());
+                }
+                try{
+                    Connection con = sqlboss.getActiveConnection();
+                    Statement query = con.createStatement();
+                    int charID = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem()).getID();
+                    String polecenie = "Update QuestCompletion set Status = 'COMPLETED', CompletionCount="+edytowane.getCompletionCount()+" where QuestID ="+edytowane.getID()+" and CharacterID="+charID+";";
+                    System.err.println(polecenie);
+                    query.execute(polecenie);
+                }
+                catch(NoActiveConnectionException|SQLException e){
+                    e.getMessage();
+                }
+                CheckForNextQuest(edytowane.getID());
+                FillCharQuestsTab();
+            }
+        });
+    }
+
+    public void CheckForNextQuest(int QuestID){
+        try {
+            Connection con = sqlboss.getActiveConnection();
+            Statement query = con.createStatement();
+            String polecenie = "Select NextQuest from QuestData where ID=" +QuestID+";";
+            ResultSet rs= query.executeQuery(polecenie);
+            int next = rs.getInt("NextQuest");
+            if(next!=0){
+                int charID = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem()).getID();
+                polecenie = "Update QuestCompletion set Status = 'ACTIVE' where CharacterID=" +charID+" and QuestID=" +next+";";
+                System.err.println(polecenie);
+                query.execute(polecenie);
+            }
+        }
+        catch(NoActiveConnectionException | SQLException e){
+            e.getMessage();
+        }
+    }
+
+    public void FillCharQuestsTab() {
+        try {
+            Connection con = sqlboss.getActiveConnection();
+            Statement query = con.createStatement();
+            if (firstTime) {
+                firstTime=false;
+                Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
+                String polecenie = "SELECT QuestData.QuestName, QuestCompletion.CompletionCount, QuestData.MaxCompletionCount, QuestData.ID FROM QuestCompletion\n" +
+                        "JOIN QuestData on QuestData.ID=QuestCompletion.QuestID\n" +
+                        "WHERE QuestCompletion.CharacterID="+postac.getID()+" and QuestCompletion.Status like 'ACTIVE';";
+                ResultSet rs = query.executeQuery(polecenie);
+                while (rs.next()) {
+                    Quest temp = new Quest();
+                    temp.setQuestName(rs.getString("QuestName"));
+                    temp.setCompletionCount(rs.getInt("CompletionCount"));
+                    temp.setID(rs.getInt("ID"));
+                    if(rs.getInt("MaxCompletionCount")==0)
+                        temp.setMaxCompletionCount(1);
+                    else
+                        temp.setMaxCompletionCount(rs.getInt("MaxCompletionCount"));
+                    if(temp.getCompletionCount()!=temp.getMaxCompletionCount())
+                        misjePostaci.add(temp);
+                }
+            }
+            else{
+                misjePostaci.clear();
+                int ID = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem()).getID();
+                String typeChoice = "";
+                String regionChoice = "";
+                if(!ConvertQuestTypeToEnum().equals("ALL"))
+                    typeChoice =  "and QuestData.CompletionType='" + ConvertQuestTypeToEnum()+"' ";
+                if(RegionChoice!=null&&!RegionChoice.getValue().equals("All"))
+                    regionChoice = "and Dungeons.Region like '" + RegionChoice.getValue()+"' ";
+                String polecenie = "SELECT DISTINCT QuestData.QuestName, QuestCompletion.CompletionCount, QuestData.MaxCompletionCount, QuestData.ID FROM QuestCompletion\n" +
+                            "JOIN QuestData on QuestData.ID=QuestCompletion.QuestID\n" +
+                            "JOIN QuestDungeonData on QuestData.ID=QuestDungeonData.QuestID\n" +
+                            "JOIN Dungeons on Dungeons.ID=QuestDungeonData.DungeonID\n" +
+                            "WHERE QuestCompletion.CharacterID=" + ID + " and QuestCompletion.Status like 'ACTIVE' " + regionChoice+ typeChoice+";";
+
+                ResultSet rs = query.executeQuery(polecenie);
+                while (rs.next()) {
+                    Quest temp = new Quest();
+                    temp.setQuestName(rs.getString("QuestName"));
+                    temp.setCompletionCount(rs.getInt("CompletionCount"));
+                    temp.setID(rs.getInt("ID"));
+                    if(rs.getInt("MaxCompletionCount")==0)
+                        temp.setMaxCompletionCount(1);
+                    else
+                        temp.setMaxCompletionCount(rs.getInt("MaxCompletionCount"));
+                    if(temp.getCompletionCount()!=temp.getMaxCompletionCount())
+                        misjePostaci.add(temp);
+                }
+            }
+
+
+        }
+        catch (NoActiveConnectionException | SQLException e){
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private String ConvertQuestTypeToEnum(){
+        String choice = QuestTypeChoice.getSelectionModel().getSelectedItem();
+
+        if(choice==null){
+            return "ALL";
+        }
+        else if(choice.equals("Drops")){
+            return "REPEAT";
+        }
+        else if(choice.equals("Daily")){
+            return "DAILY";
+        }
+        else if(choice.equals("Weekly")){
+            return "WEEKLY";
+        }
+        else if(choice.equals("Epic")){
+            return "ONETIME";
+        }
+        else{
+            return "ALL";
+        }
     }
     //
     //
@@ -625,11 +878,14 @@ public class MainWinController {
 
     public void InitiateZadaniaView(){
         try {
-            if (baza.drzewoPlansz.getListaRegionow().isEmpty())
+            if (baza.drzewoPlansz.getListaRegionow().isEmpty()) {
                 DungeonSQLMediator.loadDungeonList(baza.drzewoPlansz, baza);
-                QuestSQLMediator.loadAllQuestData(baza.bazaZadan,sqlboss);
-            if (ZadaniaRegiony.getRoot() == null)
+            }
+            QuestSQLMediator.loadAllQuestData(baza.bazaZadan,sqlboss);
+            if (ZadaniaRegiony.getRoot() == null){
                 InitiateTreeViewZadania();
+
+            }
         }
         catch(NoActiveConnectionException e){
             System.out.println("Zadania no con");
@@ -662,9 +918,16 @@ public class MainWinController {
         ZadaniaRegiony.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<String>>() {
             @Override
             public void changed(ObservableValue<? extends TreeItem<String>> observableValue, TreeItem<String> stringTreeItem, TreeItem<String> t1) {
-
+                if(t1.isLeaf()){
+                    RewardTable nagrody = baza.bazaZadan.getQuest(t1.getValue()).getListaPrzedmiotow();
+                    InitiateZadaniaNagrody(nagrody);
+                }
             }
         });
+    }
+
+    public void InitiateZadaniaNagrody(RewardTable rewards){
+        ZadaniaNagrody.setItems(FXCollections.observableArrayList(rewards.getRewardList()));
     }
 
     //

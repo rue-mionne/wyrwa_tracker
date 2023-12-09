@@ -159,9 +159,11 @@ public class ControllerMain {
         }
         catch(IOException e){
             System.err.println("Hurrrr");
+            System.err.println(e.getMessage());
         }
         catch(NoActiveConnectionException e){
             System.err.println("Połączenie yeeeet");
+            System.err.println(e.getMessage());
         }
         catch(SQLException e){
             System.err.println("Umiesz w SQL?");

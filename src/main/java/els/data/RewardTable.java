@@ -18,4 +18,12 @@ public class RewardTable {
     public ArrayList<Item> getRewardTable(){
         return rewardTable;
     }
+
+    public ArrayList<String> getRewardList(){
+        ArrayList<String> listaNagrod = new ArrayList<>();
+        for(Item item:rewardTable){
+            listaNagrod.add(item.getName().getValue());
+        }
+        return listaNagrod;
+    }
 }

@@ -15,7 +15,6 @@ public class Item implements Cloneable {
     public Item() {
     }
 
-    //TEMPORARY CONSTRUCTOR FOR TESTING, NEED DATABASE INTERFACE
     public Item(int ID, String name, int amount, int salePrice, boolean sellable, boolean shareable) {
         this.ID = ID;
         Name = new SimpleStringProperty(name);
@@ -77,5 +76,7 @@ public class Item implements Cloneable {
     public Item clone() throws CloneNotSupportedException{
         return (Item)super.clone();
     }
+
+    public int getID(){return ID;}
 //placeholder for icon
 }

@@ -1,5 +1,6 @@
 package els.surgeons;
 
+import els.data.Build;
 import els.data.Database;
 import els.data.Postac;
 import els.sqliteIO.NoActiveConnectionException;
@@ -12,6 +13,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 public class CharacterSurgeon implements IUpdateSurgeon, IInsertSurgeon, IDeleteSurgeon {
+
+    BuildSurgeon buildSurgeon;
+    InventorySurgeon inventorySurgeon;
     Database baza=null;
     ArrayList<Integer> updateSchedule=new ArrayList<>();
     ArrayList<Postac> insertList=new ArrayList<>();
@@ -19,14 +23,16 @@ public class CharacterSurgeon implements IUpdateSurgeon, IInsertSurgeon, IDelete
 
 
     ArrayList<String> deleteSchedule=new ArrayList<>();
-    public CharacterSurgeon(Database baza){this.baza=baza;}
+    public CharacterSurgeon(Database baza){
+        this.baza=baza;
+        buildSurgeon=new BuildSurgeon(baza);
+        inventorySurgeon = new InventorySurgeon(baza);
+    }
 
     @Override
     public void proceed() throws NoActiveConnectionException, SQLException {
         Connection con = baza.sqlCon.getActiveConnection();
         Statement query = con.createStatement();
-        ArrayList<String> temp=new ArrayList<>();
-        if(!insertSchedule.isEmpty()) {
             for (String polecenie : insertSchedule) {
                 query.execute(polecenie);
                 Postac postac = insertList.get(insertSchedule.indexOf(polecenie));
@@ -34,16 +40,22 @@ public class CharacterSurgeon implements IUpdateSurgeon, IInsertSurgeon, IDelete
                 ResultSet rs = query.executeQuery(dajID);
                 postac.setID(rs.getInt("ID"));
             }
-            insertSchedule.removeAll(temp);
-        }
-        if(!updateSchedule.isEmpty()) {
-            ArrayList<Integer> temp1=new ArrayList<>();
+            insertSchedule.clear();
+
             for (Integer id : updateSchedule) {
                 String polecenie = generateQuery(baza.konto.PobierzPostac(id-1));
                 query.execute(polecenie);
+                Postac postac= baza.konto.PobierzPostac(id-1);
+                for(Build build:postac.PobierzDaneBuildow().getBuildSetList()){
+                    buildSurgeon.scheduleUpdate(build);
+                }
+                if(postac.PobierzListePrzedmiotow().getEditModeList().contains(1))
+                    inventorySurgeon.scheduleUpdate(postac.PobierzListePrzedmiotow());
+                inventorySurgeon.proceed();
             }
-            updateSchedule.removeAll(temp1);
-        }
+            buildSurgeon.proceed();
+            updateSchedule.clear();
+
     }
 
     @Override
@@ -67,7 +79,6 @@ public class CharacterSurgeon implements IUpdateSurgeon, IInsertSurgeon, IDelete
         else
             polecenie = "Update Characters set Name='" + postac.getIGN() + "' where ID="+postac.getID()+";";
         //update Equipment
-        //update Build
         return polecenie;
     }
 

@@ -14,6 +14,8 @@ public class Quest {
     int EXP;
     int EP;
 
+    int CompletionCount;
+
 
     public int getID() {
         return ID;
@@ -112,5 +114,15 @@ public class Quest {
         this.ED = ED;
         this.EXP = EXP;
         this.EP = EP;
+    }
+
+    public Quest(){}
+
+    public int getCompletionCount() {
+        return CompletionCount;
+    }
+
+    public void setCompletionCount(int completionCount) {
+        CompletionCount = completionCount;
     }
 }
