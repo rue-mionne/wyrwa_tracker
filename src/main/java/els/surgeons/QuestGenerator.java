@@ -31,8 +31,9 @@ public class QuestGenerator implements  IInsertSurgeon{
         ResultSet rs = query.executeQuery(polecenie);
         if(!rs.next())
             initiateClasslessMissions(postac);
-        else if(!postac.getClassName().isEmpty()){
-            initiateCharacterSpecificMissions(postac);
+        else if(postac.getClassName()!=null){
+            if(!postac.getClassName().isEmpty())
+                initiateCharacterSpecificMissions(postac);
         }
     }
 

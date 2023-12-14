@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class ItemSQLMediator {
             try{
                 Statement query = con.createStatement();
                 ResultSet rs = query.executeQuery("Select * from ItemData where ItemID="+ID+";");
-                return new Item(rs.getInt("ItemID"), rs.getString("ItemName"),0,rs.getInt("SalePrice"), Boolean.valueOf(String.valueOf(rs.getInt("Sellable"))), Boolean.valueOf(String.valueOf(rs.getInt("Shareable"))));
+                return new Item(rs.getInt("ItemID"), rs.getString("ItemName"),0,rs.getInt("SalePrice"), rs.getInt("Sellable")==1, rs.getInt("Shareable")==1);
             }
             catch(SQLException e){
                 System.err.println("SuckQL in ItemMed");
@@ -61,5 +62,32 @@ public class ItemSQLMediator {
         }
         tablicaNagrod.wczytajTablice(kluczbaza,database);
     }
+    public static ArrayList<String> loadItemList(Database baza) throws NoActiveConnectionException, SQLException{
+        Connection con = baza.sqlCon.getActiveConnection();
+        Statement query = con.createStatement();
+        ResultSet rs = query.executeQuery("Select distinct ItemName from ItemData");
+        ArrayList<String> listaPrzedmiotow = new ArrayList<>();
+        while(rs.next()){
+            listaPrzedmiotow.add(rs.getString("ItemName"));
+        }
+        return listaPrzedmiotow;
+    }
 
+    public static int getItemID(String name, Database baza) throws NoActiveConnectionException,SQLException{
+        Connection con = baza.sqlCon.getActiveConnection();
+        Statement query = con.createStatement();
+        ResultSet rs = query.executeQuery("Select ItemID from ItemData where ItemName like '"+name+"';");
+        return rs.getInt("ItemID");
+    }
+
+    public static ArrayList<Postac> getOwners(int ID, Database baza)throws NoActiveConnectionException, SQLException{
+        Connection con = baza.sqlCon.getActiveConnection();
+        Statement query = con.createStatement();
+        ResultSet rs = query.executeQuery("Select OwnerID from InventoryData where ItemID=" +ID+";");
+        ArrayList<Postac> listaWlascicieli = new ArrayList<>();
+        while(rs.next()){
+            listaWlascicieli.add(baza.konto.PobierzPostac(rs.getInt("OwnerID")-1));
+        }
+        return listaWlascicieli;
+    }
 }

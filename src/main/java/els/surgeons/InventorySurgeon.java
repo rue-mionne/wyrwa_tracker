@@ -23,7 +23,7 @@ public class InventorySurgeon implements IUpdateSurgeon, IInsertSurgeon{
     public void scheduleInsert(Object inserted) throws NoActiveConnectionException, SQLException {
         Inventory inventory = (Inventory) inserted;
         Postac owner = inventory.getOwner();
-        String polecenie = "Insert into InventoryData (OwnerID,ItemID, Amount) values ("+owner.getID()+", "+inventory.getLastInserted()+", "+inventory.pobierzPrzedmiot(inventory.getLastInserted()).getAmount()+");";
+        String polecenie = "Insert into InventoryData (OwnerID,ItemID, Amount) values ("+owner.getID()+", "+inventory.getLastInserted()+", "+inventory.pobierzPrzedmiot(inventory.getLastInserted()).getAmount().getValue()+");";
         insertSchedule.add(polecenie);
     }
 
@@ -40,7 +40,7 @@ public class InventorySurgeon implements IUpdateSurgeon, IInsertSurgeon{
                 if(itemID==1){
                     Item modifiedItem = eq.getListaPrzedmiotow().get(wsk);
                     Postac owner = eq.getOwner();
-                    String polecenie = "Update InventoryData set Amount=" +modifiedItem.getAmount().get()+" where OwnerID=" +owner.getID()+" and ItemID=" +modifiedItem.getID()+";";
+                    String polecenie = "Update InventoryData set Amount=" +modifiedItem.getAmount().getValue()+" where OwnerID=" +owner.getID()+" and ItemID=" +modifiedItem.getID()+";";
                     query.execute(polecenie);
                     polecenie = "Update ItemData set SalePrice="+modifiedItem.getSalePrice().getValue()+" where ItemID="+modifiedItem.getID()+";";
                     query.execute(polecenie);

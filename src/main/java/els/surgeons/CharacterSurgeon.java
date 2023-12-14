@@ -41,6 +41,7 @@ public class CharacterSurgeon implements IUpdateSurgeon, IInsertSurgeon, IDelete
                 postac.setID(rs.getInt("ID"));
             }
             insertSchedule.clear();
+            insertList.clear();
 
             for (Integer id : updateSchedule) {
                 String polecenie = generateQuery(baza.konto.PobierzPostac(id-1));

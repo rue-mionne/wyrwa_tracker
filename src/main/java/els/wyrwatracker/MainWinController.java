@@ -1,6 +1,8 @@
+//TODO: as much as I feared doing so... I REALLY need to split this class into smaller classes with clunky constructors, problems with navigating and making changes increase
+
 package els.wyrwatracker;
 
-import els.data.Postac;
+import els.data.*;
 import els.sqliteIO.NoActiveConnectionException;
 import els.sqliteIO.SQLiteConnector;
 import els.surgeons.*;
@@ -14,6 +16,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -33,6 +36,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Optional;
 
 import els.data.*;
@@ -240,7 +244,13 @@ public class MainWinController {
             if(!PostaciTab.isSelected()){
                 chirurgTestowy.proceed();
             }
-
+            else {
+              /*  RegionChoice.getSelectionModel().select(0);
+                RegionChoice.setValue(RegionChoice.getSelectionModel().getSelectedItem());
+                QuestTypeChoice.getSelectionModel().select(0);
+                QuestTypeChoice.setValue(QuestTypeChoice.getSelectionModel().getSelectedItem());*/
+                RegionChoice.getSelectionModel().select("All");
+            }
     }
 
     void ZaładujBuild(String nazwaBuildu){
@@ -552,16 +562,17 @@ public class MainWinController {
 
     public void InitiateQuestTypeChoice(){
         ArrayList<String> choiceList = new ArrayList<>();
+        choiceList.add("All");
         choiceList.add("Drops");
         choiceList.add("Daily");
         choiceList.add("Weekly");
         choiceList.add("Epic");
-        choiceList.add("All");
         QuestTypeChoice.setItems(FXCollections.observableArrayList(choiceList));
         QuestTypeChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                FillCharQuestsTab();
+                if(RegionChoice.getSelectionModel().getSelectedItem()!=null)
+                    FillCharQuestsTab();
             }
         });
     }
@@ -571,15 +582,17 @@ public class MainWinController {
         Statement query = con.createStatement();
         ResultSet rs = query.executeQuery("Select distinct Region from Dungeons");
         ArrayList<String> choiceList = new ArrayList<>();
+        choiceList.add("All");
         while(rs.next()) {
             choiceList.add(rs.getString("Region"));
         }
-        choiceList.add("All");
         RegionChoice.getSelectionModel().select("All");
         RegionChoice.setItems(FXCollections.observableArrayList(choiceList));
         RegionChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                if(RegionChoice.getSelectionModel().getSelectedItem()==null)
+                    RegionChoice.getSelectionModel().select("All");
                 FillCharQuestsTab();
             }
         });
@@ -621,7 +634,15 @@ public class MainWinController {
                     Connection con = sqlboss.getActiveConnection();
                     Statement query = con.createStatement();
                     int charID = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem()).getID();
-                    String polecenie = "Update QuestCompletion set Status = 'COMPLETED', CompletionCount="+edytowane.getCompletionCount()+" where QuestID ="+edytowane.getID()+" and CharacterID="+charID+";";
+                    String polecenie;
+
+                    //TODO:shared dungeon count?
+                    //TODO: completion date if daily or weekly might need to write a separate function for all the cases at this rate
+
+                    if(edytowane.getCompletionCount()== edytowane.getMaxCompletionCount())
+                        polecenie = "Update QuestCompletion set Status = 'COMPLETED', CompletionCount="+edytowane.getCompletionCount()+" where QuestID ="+edytowane.getID()+" and CharacterID="+charID+";";
+                    else
+                        polecenie = "Update QuestCompletion set CompletionCount="+edytowane.getCompletionCount()+" where QuestID ="+edytowane.getID()+" and CharacterID="+charID+";";
                     System.err.println(polecenie);
                     query.execute(polecenie);
                 }
@@ -684,8 +705,11 @@ public class MainWinController {
                 String regionChoice = "";
                 if(!ConvertQuestTypeToEnum().equals("ALL"))
                     typeChoice =  "and QuestData.CompletionType='" + ConvertQuestTypeToEnum()+"' ";
-                if(RegionChoice!=null&&!RegionChoice.getValue().equals("All"))
-                    regionChoice = "and Dungeons.Region like '" + RegionChoice.getValue()+"' ";
+                if(RegionChoice!=null){
+                        if (!RegionChoice.getSelectionModel().getSelectedItem().equals("All"))
+                            regionChoice = "and Dungeons.Region like '" + RegionChoice.getValue() + "' ";
+
+                }
                 String polecenie = "SELECT DISTINCT QuestData.QuestName, QuestCompletion.CompletionCount, QuestData.MaxCompletionCount, QuestData.ID FROM QuestCompletion\n" +
                             "JOIN QuestData on QuestData.ID=QuestCompletion.QuestID\n" +
                             "JOIN QuestDungeonData on QuestData.ID=QuestDungeonData.QuestID\n" +
@@ -921,6 +945,7 @@ public class MainWinController {
                 if(t1.isLeaf()){
                     RewardTable nagrody = baza.bazaZadan.getQuest(t1.getValue()).getListaPrzedmiotow();
                     InitiateZadaniaNagrody(nagrody);
+                    InitiateZadaniaPostaciActive(baza.bazaZadan.getQuest(t1.getValue()).getID());
                 }
             }
         });
@@ -930,6 +955,25 @@ public class MainWinController {
         ZadaniaNagrody.setItems(FXCollections.observableArrayList(rewards.getRewardList()));
     }
 
+    public void InitiateZadaniaPostaciActive(int QuestID){
+        ArrayList<String> listaPostaci=new ArrayList<>();
+        try{
+            Connection con = sqlboss.getActiveConnection();
+            Statement query = con.createStatement();
+            String polecenie = "Select Characters.Name from Characters\n" +
+                    "INNER JOIN QuestCompletion on Characters.ID=QuestCompletion.CharacterID\n" +
+                    "where QuestCompletion.QuestID = "+QuestID+" and QuestCompletion.Status like 'ACTIVE';";
+            ResultSet rs = query.executeQuery(polecenie);
+            while(rs.next()){
+                listaPostaci.add(rs.getString("Name"));
+            }
+            ZadaniaPostaciActive.setItems(FXCollections.observableArrayList(listaPostaci));
+        }
+        catch(NoActiveConnectionException|SQLException e){
+            System.err.println(e.getMessage());
+        }
+    }
+
     //
     //
     ////
@@ -937,6 +981,126 @@ public class MainWinController {
     ////
     //
     //
+    @FXML
+    ComboBox<String> NazwaPrzedmiotu;
+    @FXML
+    ListView<String> ListaEkwipunkow;
+    @FXML
+    TextField WartoscPrzedmiotu;
+    @FXML
+    CheckBox CheckSellable;
+    @FXML
+    CheckBox CheckShareable;
+    @FXML
+    ComboBox<String> CharacterChoiceItemsCombo;
+    @FXML
+    Spinner<Integer> ItemAmountSpinner;
+    @FXML
+    Button InventoryItemAddButton;
+
+    ObservableList<String> dropDown;
+    ArrayList<String> listaPrzedmiotow;
+    Item wybrany;
+    Item lastWybrany;
+
+    public void InitiatePrzedmiotyView(){
+        try {
+            listaPrzedmiotow = ItemSQLMediator.loadItemList(baza);
+            InitiateNazwaPrzedmiotu();
+            InitiateCharacterChoiceCombo();
+            InitiateAmountSpinner();
+            InitiateAddItemButton();
+        }
+        catch(NoActiveConnectionException|SQLException e){
+            e.getMessage();
+        }
+    }
+
+    public void InitiateNazwaPrzedmiotu(){
+        String filter = NazwaPrzedmiotu.getEditor().getText();
+        dropDown = FXCollections.observableArrayList((ArrayList<String>) listaPrzedmiotow.clone());
+ //       FiltrujPrzedmioty(dropDown, filter);
+        NazwaPrzedmiotu.setItems(dropDown);
+ /*       NazwaPrzedmiotu.getEditor().textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                String filter = NazwaPrzedmiotu.getEditor().getText();
+                FiltrujPrzedmioty(dropDown, filter);
+            }
+        });*/
+        NazwaPrzedmiotu.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                try {
+                    int ID = 0;
+                    if(t1!=null&&!t1.isEmpty())
+                        ID = ItemSQLMediator.getItemID(t1, baza);
+                    wybrany=new Item();
+                    if(ID!=0)
+                         wybrany = baza.bazaPrzedmiotow.PobierzPrzedmiot(ID);
+                    if(wybrany.getID()!=0){
+                        CheckSellable.setSelected(wybrany.isSellable());
+                        CheckShareable.setSelected(wybrany.isShareable());
+                        WartoscPrzedmiotu.setText(wybrany.getSalePrice().getValue().toString());
+                        ArrayList<Postac> ownerList = ItemSQLMediator.getOwners(wybrany.getID(),baza);
+                        ArrayList<String> nameList = new ArrayList<>();
+                        for(Postac owner: ownerList){
+                            nameList.add(owner.getIGN());
+                        }
+                        ListaEkwipunkow.setItems(FXCollections.observableArrayList(nameList));
+                        lastWybrany=wybrany;
+                    }
+                }
+                catch(NoActiveConnectionException|SQLException e){
+                    e.getMessage();
+                }
+            }
+        });
+
+    }
+
+    public void InitiateCharacterChoiceCombo(){
+        ObservableList<String> listaPostaci = FXCollections.observableArrayList(konto.pobierzListePostaci());
+        CharacterChoiceItemsCombo.setItems(listaPostaci);
+    }
+
+    public void InitiateAmountSpinner(){
+        ItemAmountSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0,99999));
+    }
+
+    public void InitiateAddItemButton(){
+        InventoryItemAddButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Postac postac = konto.PobierzPostac(CharacterChoiceItemsCombo.getSelectionModel().getSelectedItem());
+                Inventory eq = postac.PobierzListePrzedmiotow();
+                if(eq.pobierzPrzedmiot(lastWybrany.getID())!=null){
+                    eq.pobierzPrzedmiot(lastWybrany.getID()).setAmount(ItemAmountSpinner.getValue()+eq.pobierzPrzedmiot(eq.getLastInserted()).getAmount().getValue());
+                    eq.getEditModeList().set(eq.getListaPrzedmiotow().indexOf(eq.pobierzPrzedmiot(lastWybrany.getID())),1);
+                }
+                else{
+                    eq.dodajPrzedmiot(baza.bazaPrzedmiotow.PobierzPrzedmiot(lastWybrany.getID()));
+                    eq.pobierzPrzedmiot(eq.getLastInserted()).setAmount(ItemAmountSpinner.getValue());
+                    int index = eq.getListaPrzedmiotow().indexOf(eq.pobierzPrzedmiot(eq.getLastInserted()));
+                    eq.getEditModeList().set(index,1);
+                }
+                InventorySurgeon inventorySurgeon = new InventorySurgeon(baza);
+                try{
+                    inventorySurgeon.scheduleUpdate(postac.PobierzListePrzedmiotow());
+                    inventorySurgeon.proceed();
+                }
+                catch(NoActiveConnectionException|SQLException e){
+                    e.getMessage();
+                }
+            }
+        });
+    }
+
+    public void FiltrujPrzedmioty(ObservableList<String> listaPzedmiotow, String filter){
+        listaPzedmiotow.removeIf((nazwa)->!nazwa.toLowerCase().contains(filter.toLowerCase()));
+
+    }
+
 
 
     public ArrayList<ISurgeon> getListaChirurgow() {

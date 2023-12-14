@@ -32,7 +32,11 @@ public class Inventory  {
     }
 
     public Item pobierzPrzedmiot(int ID){
-        return new Item();
+        for(Item item:listaPrzedmiotow){
+            if(item.getID()==ID)
+                return item;
+        }
+        return null;
     }
 
     public ArrayList<Item> getListaPrzedmiotow(){return listaPrzedmiotow;}

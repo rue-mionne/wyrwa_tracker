@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -16,6 +17,7 @@
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="els.wyrwatracker.MainWinController">
    <children>
@@ -133,20 +135,23 @@
                                     </AnchorPane>
                                 </content>
                               </Tab>
-                              <Tab fx:id="PrzedmiotyTab" text="Przedmioty">
+                              <Tab fx:id="PrzedmiotyTab" onSelectionChanged="#InitiatePrzedmiotyView" text="Przedmioty">
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <ComboBox editable="true" layoutX="26.0" layoutY="39.0" prefWidth="150.0" />
+                                          <ComboBox fx:id="NazwaPrzedmiotu" editable="true" layoutX="26.0" layoutY="39.0" prefWidth="150.0" />
                                           <Label layoutX="26.0" layoutY="14.0" text="Nazwa przedmiotu:" />
                                           <ListView fx:id="ListaEkwipunkow" layoutX="317.0" layoutY="72.0" prefHeight="284.0" prefWidth="230.0" />
                                           <Label layoutX="26.0" layoutY="78.0" text="Wartość:" />
                                           <Label layoutX="26.0" layoutY="101.0" text="Sprzedaż:" />
                                           <Label layoutX="26.0" layoutY="123.0" text="Przenoszenie:" />
-                                          <Label layoutX="317.0" layoutY="55.0" text="Lista ekwipunków:" />
+                                          <Label layoutX="317.0" layoutY="14.0" text="Lista ekwipunków:" />
                                           <TextField fx:id="WartoscPrzedmiotu" layoutX="91.0" layoutY="74.0" />
                                           <CheckBox fx:id="CheckSellable" disable="true" layoutX="101.0" layoutY="100.0" mnemonicParsing="false" />
                                           <CheckBox fx:id="CheckShareable" disable="true" layoutX="119.0" layoutY="122.0" mnemonicParsing="false" />
+                                          <ComboBox fx:id="CharacterChoiceItemsCombo" editable="true" layoutX="287.0" layoutY="39.0" prefWidth="150.0" />
+                                          <Spinner fx:id="ItemAmountSpinner" editable="true" layoutX="438.0" layoutY="39.0" prefHeight="24.0" prefWidth="85.0" />
+                                          <Button fx:id="InventoryItemAddButton" layoutX="524.0" layoutY="39.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="29.0" text="+" />
                                        </children>
                                     </AnchorPane>
                                 </content>
@@ -159,7 +164,28 @@
           </Tab>
           <Tab fx:id="CeleTab" text="Cele">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView layoutX="14.0" layoutY="14.0" prefHeight="321.0" prefWidth="263.0">
+                          <columns>
+                            <TableColumn prefWidth="184.0" text="Nazwa misji" />
+                            <TableColumn minWidth="2.0" prefWidth="78.0" text="Priorytet" />
+                          </columns>
+                        </TableView>
+                        <Line endX="-100.0" endY="346.0" layoutX="401.0" layoutY="14.0" startX="-100.0" />
+                        <TableView layoutX="314.0" layoutY="14.0" prefHeight="320.0" prefWidth="271.0">
+                          <columns>
+                            <TableColumn prefWidth="212.0" text="Nazwa" />
+                            <TableColumn prefWidth="58.0" text="Ilość" />
+                          </columns>
+                        </TableView>
+                        <TextField layoutX="14.0" layoutY="334.0" />
+                        <Spinner layoutX="185.0" layoutY="334.0" prefHeight="24.0" prefWidth="75.0" />
+                        <Button layoutX="260.0" layoutY="334.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="23.0" text="+" />
+                        <ComboBox editable="true" layoutX="314.0" layoutY="334.0" prefWidth="150.0" />
+                        <Spinner layoutX="464.0" layoutY="334.0" prefHeight="24.0" prefWidth="91.0" />
+                        <Button layoutX="554.0" layoutY="334.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="26.0" text="+" />
+                     </children></AnchorPane>
             </content>
           </Tab>
             <Tab text="Analiza">
