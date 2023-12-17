@@ -29,12 +29,12 @@
                      <children>
                         <TabPane layoutX="-1.0" layoutY="1.0" prefHeight="370.0" prefWidth="600.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
-                            <Tab fx:id="PostaciTab" closable="false" onSelectionChanged="#PostaciLoadUnload" text="Postaci">
+                            <Tab fx:id="PostaciTab" closable="false" text="Postaci">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="370.0" prefWidth="571.0">
                                        <children>
                                           <Separator layoutX="366.0" orientation="VERTICAL" prefHeight="376.0" prefWidth="4.0" />
-                                          <ListView fx:id="CharacterList" layoutX="366.0" onMouseClicked="#WybierzPostac" prefHeight="345.0" prefWidth="200.0" />
+                                          <ListView fx:id="CharacterList" layoutX="366.0" prefHeight="345.0" prefWidth="200.0" />
                                           <ScrollPane fx:id="QuestsForCharacter" disable="true" prefHeight="367.0" prefWidth="365.0" visible="false">
                                             <content>
                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="369.0" prefWidth="358.0">
@@ -47,7 +47,7 @@
                                                           <TableColumn fx:id="CompletionCountChar" prefWidth="150.0" text="Ile Razy Ukończone" />
                                                         </columns>
                                                       </TableView>
-                                                      <Button fx:id="QuestForCharReturn" layoutX="282.0" layoutY="14.0" mnemonicParsing="false" onAction="#ReturnToCharPrev" text="Powrót" />
+                                                      <Button fx:id="QuestForCharReturn" layoutX="282.0" layoutY="14.0" mnemonicParsing="false" text="Powrót" />
                                                    </children>
                                                 </AnchorPane>
                                             </content>
@@ -78,14 +78,14 @@
                                                       <TextField fx:id="EDMultipField" editable="false" layoutX="156.0" layoutY="137.0" onMouseClicked="#EnableEDMultipEdit" />
                                                       <Label fx:id="EstCP111" layoutX="85.0" layoutY="171.0" text="Dod. ID:" />
                                                       <TextField fx:id="IDMultipField" editable="false" layoutX="156.0" layoutY="167.0" onMouseClicked="#EnableIDMultipEdit" />
-                                                      <Button fx:id="AddConfigButton" layoutX="311.0" layoutY="205.0" mnemonicParsing="false" onAction="#AddBuildConfig" prefHeight="24.0" prefWidth="8.0" text="+" />
+                                                      <Button fx:id="AddConfigButton" layoutX="311.0" layoutY="205.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="8.0" text="+" />
                                                       <ChoiceBox fx:id="ClassNameField" layoutX="158.0" layoutY="45.0" prefHeight="24.0" prefWidth="168.0" />
-                                                      <Button fx:id="QuestInterfaceButton" layoutX="6.0" layoutY="103.0" mnemonicParsing="false" onAction="#ShowQuestsForCharacter" prefHeight="69.0" prefWidth="77.0" text="Zadania" />
+                                                      <Button fx:id="QuestInterfaceButton" layoutX="6.0" layoutY="103.0" mnemonicParsing="false" prefHeight="69.0" prefWidth="77.0" text="Zadania" />
                                                    </children>
                                                 </AnchorPane>
                                             </content>
                                           </ScrollPane>
-                                          <Button fx:id="DodajPostac" layoutX="366.0" layoutY="344.0" mnemonicParsing="false" onAction="#AddCharacter" prefHeight="24.0" prefWidth="201.0" text="Dodaj postać" />
+                                          <Button fx:id="DodajPostac" layoutX="366.0" layoutY="344.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="201.0" text="Dodaj postać" />
 
                                        </children>
                                     </AnchorPane>

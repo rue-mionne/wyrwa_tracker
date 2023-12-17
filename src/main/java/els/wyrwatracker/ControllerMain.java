@@ -136,7 +136,6 @@ public class ControllerMain {
             dzieciak = (MainWinController) fxmlLoader.getController();
             dzieciak.OdbierzSQLHandler(sqlHandler);
             dzieciak.OdbierzBaze(baza);
-            dzieciak.PostaciLoadUnload(new Event(new EventType<>()));
 
             Window win = scena2.getWindow();
             win.setOnCloseRequest(event -> {
