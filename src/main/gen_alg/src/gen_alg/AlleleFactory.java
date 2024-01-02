@@ -1,3 +1,5 @@
+package gen_alg;
+
 public class AlleleFactory {
     Allele template;
     void initiateAlleleFactory(Allele template){
@@ -8,6 +10,6 @@ public class AlleleFactory {
         if(template!=null)
             return template.generateNewAllele();
         else
-            throw new Exception("Allele Factory not initiated!");
+            throw new Exception("gen_alg.Allele Factory not initiated!");
     }
 }

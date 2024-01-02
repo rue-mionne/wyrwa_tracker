@@ -1,3 +1,5 @@
+package gen_alg;
+
 public interface Incubator {
     Integer getGenerationCount();
     void setMaxGenerationCount(Integer maxGenerationCount);
@@ -6,4 +8,6 @@ public interface Incubator {
     void setSpecimenFactory(SpecimenFactory specimenFactory);
     SpecimenFactory getSpecimenFactory();
     void setGeneticCrossReference(GeneCrossTemplate geneticCrossReference);
+    Integer getMaxGenerationCount();
+    void Start();
 }
