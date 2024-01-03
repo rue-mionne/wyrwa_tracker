@@ -1,16 +1,18 @@
 package gen_alg;
 
-import javafx.util.Pair;
-
 import java.util.ArrayList;
-import java.util.Iterator;
+//import java.util.Iterator;
 import java.util.LinkedList;
 
+//
+//crossModel and percentage are checked on construction; even though the last percentage spot is not used, it is necessary for coherency check
+//weights aren't checked, and it is on user's part to check if length is the same as population count
+//
 public class GeneCrossTemplate {
     boolean autoEnabled;
-    LinkedList<Double> percentage;
-    LinkedList<LinkedList<Integer>> crossModel;
-    ArrayList<Double> weights;
+    LinkedList<Double> percentage; //percent of new specimen using crossModel[index]
+    LinkedList<LinkedList<Integer>> crossModel;//scheme of passing down the alleles 1=parent1, 2=parent2 only 1 or 2 possible
+    ArrayList<Double> weights;//weight of a specimen after sorting specimen list
     //GCTIterator iterator;
     GeneCrossTemplate(LinkedList<Double> percentage, LinkedList<LinkedList<Integer>> crossModel, ArrayList<Double> weights , boolean autoEnabled) throws Exception {
         Double suma=0.0;

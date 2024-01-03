@@ -6,6 +6,9 @@ public class GeneScheme {
     Allele template;
     AlleleFactory alleleGenerator;
     ArrayList<Allele> alleles=new ArrayList<>();
+    GeneScheme(Allele template){
+        initializeAlleleFactory(template);
+    }
     void initializeAlleleFactory(Allele template){
         this.template=template;
         alleleGenerator.initiateAlleleFactory(template);
@@ -15,5 +18,16 @@ public class GeneScheme {
         for(int i=0;i<length;i++){
             alleleGenerator.generateAllele();
         }
+    }
+    public boolean isInitialised(){
+        return !alleles.isEmpty();
+    }
+
+    public Integer getLength(){
+        return alleles.size();
+    }
+
+    ArrayList<Allele> getAlleles(){
+        return alleles;
     }
 }

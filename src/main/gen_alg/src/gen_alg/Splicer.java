@@ -1,63 +1,85 @@
 package gen_alg;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class Splicer {
+    int population;
+    boolean foundPerfect=false;
     double mutationProbability=0.1;
     ArrayList<Specimen> subjects;
-    GeneCrossTemplate geneticCrossReference=null;
-    AlleleFactory alleleMutationGenerator;
-    Splicer(ArrayList<Specimen> subjects){
+    GeneCrossTemplate geneticCrossReference;
+    Splicer(ArrayList<Specimen> subjects) throws Exception {
         this.subjects=subjects;
+        Collections.sort(this.subjects);
+        population=subjects.size();
+        generateDefaultCrossTemplate();
     }
+
     ArrayList<Specimen> progressToNextGeneration() throws Exception {
-        Integer population = subjects.size();
         Integer usedSpots=0;
         Double setSize;
         Integer numberOfSets = geneticCrossReference.percentage.size();
         ArrayList<Double> spinningWheel=new ArrayList<>();
         spinningWheel.add(geneticCrossReference.weights.get(0));
         ArrayList<Specimen> newGen = new ArrayList<>();
+        //generate "spinning wheel" - array of cumulated weights used to choose random specimen
         for(int i=1;i<geneticCrossReference.weights.size();i++){
             double temp = spinningWheel.get(i-1);
             double next = geneticCrossReference.weights.get(i);
             spinningWheel.add(temp+next);
         }
+        //calculate sectors/sets of different cross patterns
         for(int i=0;i<numberOfSets-1;i++){
             setSize=geneticCrossReference.percentage.get(i)*population;
             setSize = Math.floor(setSize);
             usedSpots+= setSize.intValue();
-            {
-                for(int j=0;j<setSize;j++){
-                    LinkedList<Integer> crossModel = geneticCrossReference.crossModel.get(i);
-                    Specimen parent1 = getRandomSpecimen(spinningWheel);
-                    Specimen parent2 = getRandomSpecimen(spinningWheel);
-                    Specimen newSpecimen = parent1.generateNewSpecimen();
-                    newSpecimen.genetics.initializeAlleleFactory(parent1.genetics.template);
-                    for(int k=0; k<crossModel.size();k++){
-                        if(crossModel.get(k)==1){
-                            newSpecimen.genetics.alleles.set(k,parent1.genetics.alleles.get(k));
-                        }
-                        else if(crossModel.get(k)==2){
-                            newSpecimen.genetics.alleles.set(k,parent2.genetics.alleles.get(k));
-                        }
-                        else{
-                            throw new Exception("gen_alg.Splicer: Wrong model configuration");
-                        }
-                    }
-                    if(Math.random()<mutationProbability) {
-                        int mutatedAllele = (int) (Math.random() * crossModel.size());
-                        alleleMutationGenerator.initiateAlleleFactory(parent1.genetics.template);
-                        newSpecimen.genetics.alleles.set(mutatedAllele, alleleMutationGenerator.generateAllele());
-                    }
-                    newGen.add(newSpecimen);
-                    usedSpots++;
+            generateCrossSetSpecimens(setSize, i, spinningWheel, newGen);
+        }
+        Integer setNumber = numberOfSets-1;
+        Integer lastSetSize = population-usedSpots;
+        generateCrossSetSpecimens(lastSetSize.doubleValue(),setNumber,spinningWheel,newGen);
+        Collections.sort(subjects);
+        subjects=newGen;
+        return newGen;
+    }
 
-                }
+    private void generateCrossSetSpecimens(Double setSize, int setNumber, ArrayList<Double> spinningWheel, ArrayList<Specimen> newGen) throws Exception {
+        for(int j = 0; j< setSize; j++){
+            LinkedList<Integer> crossModel = geneticCrossReference.crossModel.get(setNumber);
+            Specimen parent1 = getRandomSpecimen(spinningWheel);
+            Specimen parent2 = getRandomSpecimen(spinningWheel);
+            Specimen newSpecimen = parent1.generateNewSpecimen();
+            createNewSpecimenGenome(crossModel, newSpecimen, parent1, parent2);
+            checkForMutations(newSpecimen);
+            newGen.add(newSpecimen);
+            newSpecimen.score = newSpecimen.evaluateGenomeValue();
+            foundPerfect= newSpecimen.heuCheck();
+        }
+    }
+
+    private void checkForMutations(Specimen newSpecimen) throws Exception {
+        if(Math.random()<mutationProbability) {
+            Allele template = newSpecimen.genetics.template;
+            int mutatedAllele = (int) (Math.random() * newSpecimen.genetics.alleles.size());
+            newSpecimen.genetics.alleles.set(mutatedAllele, template.generateNewAllele());
+        }
+    }
+
+    private static void createNewSpecimenGenome(LinkedList<Integer> crossModel, Specimen newSpecimen, Specimen parent1, Specimen parent2) throws Exception {
+        for(int k = 0; k< crossModel.size(); k++){
+            if(crossModel.get(k)==1){
+                newSpecimen.genetics.alleles.set(k, parent1.genetics.alleles.get(k));
+            }
+            else if(crossModel.get(k)==2){
+                newSpecimen.genetics.alleles.set(k, parent2.genetics.alleles.get(k));
+            }
+            else{
+                throw new Exception("gen_alg.Splicer: Wrong model configuration");
             }
         }
-        return newGen;
     }
 
     Specimen getRandomSpecimen(ArrayList<Double> spinningWheel) throws Exception {
@@ -70,5 +92,26 @@ public class Splicer {
                 index++;
         }
         throw new Exception("Spicer: roll out of bounds");
+    }
+
+    boolean isFoundPerfect(){return foundPerfect;}
+
+    //HELPERS
+    void generateDefaultCrossTemplate() throws Exception {
+        LinkedList<Double> defaultPerc = new LinkedList<>();
+        defaultPerc.add(1.0);
+        LinkedList<LinkedList<Integer>> defaultCrossModel = new LinkedList<>();
+        LinkedList<Integer> defaultGeneCross = new LinkedList<>();
+        for(int i = 0;i<subjects.get(0).genetics.alleles.size();i++){
+            if(i%2==0)
+                defaultGeneCross.add(1);
+            else
+                defaultGeneCross.add(2);
+        }
+        defaultCrossModel.add(defaultGeneCross);
+        Double array[] =new Double[population];
+        Arrays.fill(array,1.0);
+        ArrayList<Double> defaultWeights = new ArrayList<>(Arrays.asList(array));
+        geneticCrossReference = new GeneCrossTemplate(defaultPerc,defaultCrossModel,defaultWeights,false);
     }
 }

@@ -10,23 +10,14 @@ public class Calendar {
     Integer maxGenerationCount=100;
     Integer delayInMs=100;
     boolean go=true;
-    Heuristic condition;
-    boolean endOnCondition;
     ArrayList<Flow.Subscriber<? super GenerationCompleteEvent>> subscribers= new ArrayList<>();
     SubmissionPublisher<GenerationCompleteEvent> notifier;
-
-    public void UpdateCondition(Heuristic condition){
-        this.condition=condition;
-
-    }
-
-    Calendar(boolean endOnCondition, IncubatorBase incubator){this.endOnCondition=endOnCondition;this.incubator=incubator;}
-    Calendar(boolean endOnCondition, Heuristic condition, IncubatorBase incubator){this.endOnCondition=endOnCondition;this.condition=condition;this.incubator=incubator;}
+    Calendar(IncubatorBase base){incubator=base;}
     public void addSubscriber(Flow.Subscriber<GenerationCompleteEvent> generationPeeker){notifier.subscribe(generationPeeker);}
     public void start() throws Exception {
-        while(generationCount<maxGenerationCount&&(endOnCondition&&(condition.check()))){
+        while((generationCount<maxGenerationCount)&&(incubator.splicer.isFoundPerfect())){
             if(go) {
-                incubator.specimenArrayList=incubator.splicer.progressToNextGeneration();
+                incubator.specimenArrayList = incubator.splicer.progressToNextGeneration();
                 notifier.submit(new GenerationCompleteEvent());
                 generationCount++;
                 try {
@@ -36,5 +27,8 @@ public class Calendar {
                 }
             }
         }
+        GenerationCompleteEvent event = new GenerationCompleteEvent();
+        event.lastGen=true;
+        notifier.submit(event);
     }
 }
