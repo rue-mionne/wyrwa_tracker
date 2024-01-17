@@ -3,7 +3,7 @@ package gen_alg;
 import java.util.ArrayList;
 import java.util.concurrent.Flow;
 
-public abstract class IncubatorBase implements Incubator{
+public class IncubatorBase implements Incubator{
     //Modules
     Specimen template;
     Splicer splicer;
@@ -18,10 +18,14 @@ public abstract class IncubatorBase implements Incubator{
     }
 
     @Override
-    public void Start() throws Exception {
-        specimenArrayList=nest.generateStartPopulation();
-        splicer = new Splicer(specimenArrayList);
-        generationFlow.start();
+    public void run() {
+        try {
+            specimenArrayList=nest.generateStartPopulation();
+            splicer = new Splicer(specimenArrayList);
+            generationFlow.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //OPTIONAL SETTERS/GETTERS
@@ -91,7 +95,7 @@ public abstract class IncubatorBase implements Incubator{
     }
 
     @Override
-    public ArrayList<Specimen> getSpecimen() {
+    public ArrayList<? extends Specimen> getSpecimen() {
         return (ArrayList<Specimen>) specimenArrayList.clone();
     }
 }

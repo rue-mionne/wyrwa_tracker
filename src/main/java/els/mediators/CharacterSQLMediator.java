@@ -20,7 +20,7 @@ public class CharacterSQLMediator {
     public static void ReadBuildSet(Postac postac, SQLiteConnector connector) throws NoActiveConnectionException, SQLException{
         Connection polaczenie = connector.getActiveConnection();
         Statement query = polaczenie.createStatement();
-        ResultSet rs = query.executeQuery("Select BuildSetsTable.BuildName AS BuildName, BuildSetsTable.EDMultip AS EDMultip, BuildSetsTable.EXPMultip AS EXPMultip, BuildSetsTable.EstCP AS ESTCp, BuildSetsTable.IDMultip AS IDMultip from BuildSetsTable INNER JOIN Characters ON BuildSetsTable.CharacterID=Characters.ID WHERE ID="+postac.getID()+";");
+        ResultSet rs = query.executeQuery("Select BuildSetsTable.BuildSetID AS ID, BuildSetsTable.BuildName AS BuildName, BuildSetsTable.EDMultip AS EDMultip, BuildSetsTable.EXPMultip AS EXPMultip, BuildSetsTable.EstCP AS ESTCp, BuildSetsTable.IDMultip AS IDMultip from BuildSetsTable INNER JOIN Characters ON BuildSetsTable.CharacterID=Characters.ID WHERE ID="+postac.getID()+";");
         while(rs.next()){
             postac.PobierzDaneBuildow().AddNewBuildSet(ReadBuild(postac,rs));
         }
@@ -28,7 +28,7 @@ public class CharacterSQLMediator {
 
     public static Build ReadBuild(Postac postac, ResultSet rs) throws SQLException{
 
-        Build build = new Build(rs.getString("BuildName"),rs.getInt("EstCP"),rs.getInt("EXPMultip"),rs.getInt("EDMultip"),rs.getInt("IDMultip"), postac.getID());
+        Build build = new Build(rs.getInt("ID"), rs.getString("BuildName"),rs.getInt("EstCP"),rs.getInt("EXPMultip"),rs.getInt("EDMultip"),rs.getInt("IDMultip"), postac.getID());
         return build;
     }
 

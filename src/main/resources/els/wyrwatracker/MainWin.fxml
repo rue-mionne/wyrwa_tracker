@@ -188,9 +188,38 @@
                      </children></AnchorPane>
             </content>
           </Tab>
-            <Tab text="Analiza">
+            <Tab fx:id="AnalizaTab" text="Analiza">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="GenerationCounter" layoutX="420.0" layoutY="14.0" text="Pokolenie: " />
+                        <TableView fx:id="MainOverview" layoutX="293.0" layoutY="38.0" prefHeight="328.0" prefWidth="293.0">
+                          <columns>
+                            <TableColumn fx:id="PathCol" prefWidth="226.0" text="Scieżka" />
+                            <TableColumn fx:id="ScoreCol" minWidth="0.0" prefWidth="66.0" text="Punkty" />
+                          </columns>
+                        </TableView>
+                        <Button fx:id="StartStopButton" layoutX="201.0" layoutY="119.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="85.0" text="Start" />
+                        <Label layoutX="293.0" layoutY="14.0" text="Wyniki:" />
+                        <TableView fx:id="DetailedOverview" layoutX="14.0" layoutY="194.0" prefHeight="167.0" prefWidth="270.0">
+                          <columns>
+                            <TableColumn fx:id="CharacterPathData" prefWidth="75.0" text="Postać" />
+                            <TableColumn fx:id="DungeonPathData" prefWidth="100.0" text="Plansza" />
+                              <TableColumn fx:id="QuestPathData" prefWidth="94.0" text="Misje" />
+                          </columns>
+                        </TableView>
+                        <Label layoutX="14.0" layoutY="169.0" text="Dane wybranej ścieżki:" />
+                        <Label layoutX="22.0" layoutY="14.0" text="Populacja:" />
+                        <Label layoutX="19.0" layoutY="42.0" text="Max ilość pokoleń:" />
+                        <Label layoutX="19.0" layoutY="101.0" text="Opóźnienie:" />
+                        <Label layoutX="19.0" layoutY="68.0" text="Prawdopodobieństwo mutacji:" />
+                        <Button fx:id="SzablonPrzeplotowSpinner" disable="true" layoutX="17.0" layoutY="132.0" mnemonicParsing="false" text="Szablon przeplotów" />
+                        <Spinner fx:id="PopulacjaSpinner" layoutX="91.0" layoutY="10.0" prefHeight="24.0" prefWidth="81.0" />
+                        <Spinner fx:id="MaxIlPokSpinner" layoutX="140.0" layoutY="38.0" prefHeight="24.0" prefWidth="89.0" />
+                        <Spinner fx:id="MutProbSpinner" layoutX="215.0" layoutY="64.0" prefHeight="24.0" prefWidth="74.0" />
+                        <Spinner fx:id="DelaySpinner" layoutX="99.0" layoutY="97.0" prefHeight="24.0" prefWidth="70.0" />
+                        <Label layoutX="172.0" layoutY="101.0" text="ms" />
+                     </children></AnchorPane>
               </content>
             </Tab>
         </tabs>

@@ -102,4 +102,6 @@ public class CharacterSurgeon implements IUpdateSurgeon, IInsertSurgeon, IDelete
     public void reverseChanges(){
         deleteSchedule.clear();
     }
+
+    public BuildSurgeon getBuildSurgeon(){return buildSurgeon;}
 }

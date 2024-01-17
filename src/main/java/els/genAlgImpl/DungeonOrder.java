@@ -5,7 +5,7 @@ import gen_alg.*;
 import java.util.ArrayList;
 
 public class DungeonOrder extends Specimen{
-    CharDungPair alleleTemplate=new CharDungPair(0,0);
+    CharDungPair alleleTemplate;
     ArrayList<Double> orderWeight = new ArrayList<>();
     Integer genomeLength = 7;
     public DungeonOrder(Allele template) {
@@ -15,12 +15,18 @@ public class DungeonOrder extends Specimen{
     @Override
     public Double evaluateGenomeValue() {
         Double value=0.0;
-        if(this.getGenetics().isInitialised()&&!orderWeight.isEmpty())
+        if(orderWeight.isEmpty()){
+            for(int i = 0;i<genomeLength;i++){
+                orderWeight.add(1.0);
+            }
+        }
+        if(this.getGenetics().isInitialised())
             for(int i=0; i<this.getGenetics().getLength();i++) {
                 value += this.getAlleles().get(i).evaluateAlleleValue()*orderWeight.get(i);
             }
         score=value;
-        return value;
+        System.out.println(score);
+        return score;
     }
 
     @Override
@@ -30,19 +36,17 @@ public class DungeonOrder extends Specimen{
 
     @Override
     public Specimen generateNewSpecimen() throws Exception {
-        Specimen newSpecimen = new DungeonOrder(alleleTemplate);
-        newSpecimen.initiateGenetics(genomeLength);
+        DungeonOrder newSpec = new DungeonOrder(alleleTemplate);
+        newSpec.setAlleleTemplate(alleleTemplate);
+        newSpec.initiateGenetics(genomeLength);
+        Specimen newSpecimen = newSpec;
+        System.out.println("New gen");
         return newSpecimen;
     }
 
     @Override
     public int compareTo(Specimen specimen) {
-        if(this.score> specimen.score)
-            return 1;
-        else if(this.score<specimen.score)
-            return -1;
-        else
-            return 0;
+        return specimen.score.compareTo(score);
     }
 
     public ArrayList<Double> getOrderWeight() {

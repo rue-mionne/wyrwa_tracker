@@ -41,7 +41,7 @@ public class Splicer {
         Integer setNumber = numberOfSets-1;
         Integer lastSetSize = population-usedSpots;
         generateCrossSetSpecimens(lastSetSize.doubleValue(),setNumber,spinningWheel,newGen);
-        Collections.sort(subjects);
+        Collections.sort(newGen);
         subjects=newGen;
         return newGen;
     }
@@ -99,19 +99,29 @@ public class Splicer {
     //HELPERS
     void generateDefaultCrossTemplate() throws Exception {
         LinkedList<Double> defaultPerc = new LinkedList<>();
-        defaultPerc.add(1.0);
+        defaultPerc.add(0.1);
+        defaultPerc.add(0.9);
         LinkedList<LinkedList<Integer>> defaultCrossModel = new LinkedList<>();
+        LinkedList<Integer> strongestSurvive = new LinkedList<>();
         LinkedList<Integer> defaultGeneCross = new LinkedList<>();
         for(int i = 0;i<subjects.get(0).genetics.alleles.size();i++){
             if(i%2==0)
                 defaultGeneCross.add(1);
             else
                 defaultGeneCross.add(2);
+            strongestSurvive.add(1);
         }
+        defaultCrossModel.add(strongestSurvive);
         defaultCrossModel.add(defaultGeneCross);
         Double array[] =new Double[population];
         Arrays.fill(array,1.0);
         ArrayList<Double> defaultWeights = new ArrayList<>(Arrays.asList(array));
+        defaultWeights.set(0,8.0);
+        defaultWeights.set(1,3.0);
+        int half = defaultWeights.size()/2;
+        for(int i=half;i<defaultWeights.size();i++){
+            defaultWeights.set(i,0.0);
+        }
         geneticCrossReference = new GeneCrossTemplate(defaultPerc,defaultCrossModel,defaultWeights,false);
     }
 }

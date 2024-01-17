@@ -6,28 +6,18 @@ import els.data.*;
 import els.sqliteIO.NoActiveConnectionException;
 import els.sqliteIO.SQLiteConnector;
 import els.surgeons.*;
-import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.sql.Connection;
@@ -35,14 +25,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Optional;
 
-import els.data.*;
 import els.mediators.*;
 import javafx.util.Callback;
-import javafx.util.converter.IntegerStringConverter;
 
 public class MainWinController {
 
@@ -50,6 +35,12 @@ public class MainWinController {
     public Button AddConfigButton;
     public Button QuestInterfaceButton;
     public Button DodajPostac;
+    public Button SzablonPrzeplotowSpinner;
+    public Spinner PopulacjaSpinner;
+    public Spinner MutProbSpinner;
+    public Spinner MaxIlPokSpinner;
+    public Spinner DelaySpinner;
+
     SQLiteConnector sqlboss;
 
     @FXML
@@ -170,7 +161,7 @@ public class MainWinController {
         sqlboss = SQLConnector;
     }
 
-    public void OdbierzBaze(Database base){
+    public void OdbierzBaze(Database base) throws SQLException, NoActiveConnectionException {
         this.baza = base;
         this.konto = base.konto;
         PostaciTabPack postaciTabPack = new PostaciTabPack(Ekwipunek,Przedmiot,Ilosc,Wartosc,CharacterList, CharacterName, CharacterNameField, ClassIcon, ClassName, ClassNameField, ConfigChoice, EDMultipField, EXPMultipField, EstCP, EstCP1, EstCP11, EstCP111, EstCPField, IDMultipField, PrzegladTab, baza, konto, MainClassWin, QuestsForCharacter,QuestTypeChoice,RegionChoice,ShowCharQuest,QuestNameChar,CompletionCountChar,PostaciTab, QuestForCharReturn);
@@ -179,6 +170,8 @@ public class MainWinController {
         postaciTabPack.setQuestInterfaceButton(QuestInterfaceButton);
         PostaciTabClass postaciTab = new PostaciTabClass(baza, postaciTabPack);
         postaciTab.PostaciLoadUnload(new Event(new EventType<>()));
+        AnalizaFields analizaFields = new AnalizaFields(GenerationCounter, PathCol,ScoreCol,StartStopButton, MainOverview, DetailedOverview, CharacterPathData, DungeonPathData, QuestPathData,SzablonPrzeplotowSpinner, PopulacjaSpinner, MutProbSpinner, MaxIlPokSpinner,DelaySpinner);
+        KowalskiAnalysis analysisTab = new KowalskiAnalysis(sqlboss,analizaFields);
     }
 
     //
@@ -528,7 +521,18 @@ public class MainWinController {
         return listaChirurgow;
     }
 
-
+//
+    //Analiza
+    //
+    public Label GenerationCounter;
+    public TableColumn PathCol;
+    public TableColumn ScoreCol;
+    public Button StartStopButton;
+    public TableView MainOverview;
+    public TableView DetailedOverview;
+    public TableColumn CharacterPathData;
+    public TableColumn DungeonPathData;
+    public TableColumn QuestPathData;
 }
 
 

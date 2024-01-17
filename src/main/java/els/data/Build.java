@@ -10,7 +10,8 @@ public class Build {
 
     int OwnerID;
 
-    public Build(String Name, int estCP, int EXPMultip, int EDMultip, int IDMultip, int OwnerID) {
+    public Build(int ID, String Name, int estCP, int EXPMultip, int EDMultip, int IDMultip, int OwnerID) {
+        this.ID=ID;
         this.Name = Name;
         EstCP = estCP;
         this.EXPMultip = EXPMultip;

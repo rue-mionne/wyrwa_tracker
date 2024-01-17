@@ -16,12 +16,13 @@ public class CharDungPair extends Allele{
     ArrayList<Integer> buildIDRange=new ArrayList<>();
     Integer chosenDungeonID;
     Integer chosenBuildID;
+    Connection con;
     @Override
     public Double evaluateAlleleValue() {
         Double alleleValue=0.0;
         try {
-            alleleValue += estimateEDEPvalues();
-            alleleValue+=estimateSellableValue();
+            alleleValue += estimateEDEPvalues()/1000;
+            alleleValue+=estimateSellableValue()/1000;
         }
         catch(SQLException e){
             System.err.println(e.getMessage());
@@ -29,7 +30,7 @@ public class CharDungPair extends Allele{
         return alleleValue;
     }
 
-    CharDungPair(Integer DungeonID,Integer BuildID){
+    public CharDungPair(Integer DungeonID, Integer BuildID){
         chosenBuildID=BuildID;
         chosenDungeonID=DungeonID;
     }
@@ -47,11 +48,14 @@ public class CharDungPair extends Allele{
                 indexBuildID = gen.nextInt(buildIDRange.size());
             }
             while(checkIfNoQuests(indexDungID,indexBuildID));
-            return new CharDungPair(dungeonIDRange.get(indexDungID),buildIDRange.get(indexBuildID));
+            CharDungPair newPair= new CharDungPair(dungeonIDRange.get(indexDungID),buildIDRange.get(indexBuildID));
+            newPair.initiateIDBases(con);
+            return newPair;
         }
     }
 
-    public void initiateIDBases() throws SQLException {
+    public void initiateIDBases(Connection con) throws SQLException {
+        this.con = con;
         Statement query = con.createStatement();
         ResultSet rs = query.executeQuery("Select BuildSetID from BuildSetsTable");
         while(rs.next()){
@@ -72,7 +76,7 @@ public class CharDungPair extends Allele{
                 "INNER join Characters on QuestCompletion.CharacterID=Characters.ID\n" +
                 "INNER join BuildSetsTable on BuildSetsTable.CharacterID=Characters.ID\n" +
                 "INNER join Dungeons on Dungeons.ID=QuestDungeonData.DungeonID\n" +
-                "WHERE DungeonID=" +chosenDungeonID+" and BuildSetID= "+chosenBuildID+" and EstCP>OptimalCP");
+                "WHERE DungeonID=" +chosenDungeonID+" and (BuildSetID= "+chosenBuildID+" or QuestCompletion.CharacterID=1)and EstCP>OptimalCP and Status like 'Active'");
         while(rs.next()){
             estimatedValues+=1*rs.getInt("ED")+0.9*rs.getInt("EP");
         }
@@ -90,7 +94,7 @@ public class CharDungPair extends Allele{
                 "INNER join Dungeons on Dungeons.ID=QuestDungeonData.DungeonID\n" +
                 "INNER join RewardData on RewardData.QuestID=QuestData.ID\n" +
                 "INNER join ItemData on ItemData.ItemID=RewardData.RewardID\n" +
-                "WHERE DungeonID=4 and BuildSetID=1 and EstCP>OptimalCP and Sellable=1");
+                "WHERE DungeonID="+chosenDungeonID+" and (BuildSetID="+chosenBuildID+" or QuestCompletion.CharacterID=1 ) and EstCP>OptimalCP and Sellable=1 and Status like 'Active'");
         while(rs.next()){
             estimatedValue+=rs.getInt("SalePrice")*rs.getInt("Amount");
         }
@@ -105,7 +109,7 @@ public class CharDungPair extends Allele{
                 "INNER join Characters on QuestCompletion.CharacterID=Characters.ID\n" +
                 "INNER join BuildSetsTable on BuildSetsTable.CharacterID=Characters.ID\n" +
                 "INNER join Dungeons on Dungeons.ID=QuestDungeonData.DungeonID\n" +
-                "WHERE DungeonID="+dungeonIDRange.get(chosenDungeonIndex)+" and BuildSetID="+buildIDRange.get(chosenBuildIndex)+" and EstCP>OptimalCP");
-        return rs.wasNull();
+                "WHERE DungeonID="+dungeonIDRange.get(chosenDungeonIndex)+" and BuildSetID="+buildIDRange.get(chosenBuildIndex)+" and EstCP>OptimalCP and Status like 'Active'");
+        return !rs.next();
     }
 }

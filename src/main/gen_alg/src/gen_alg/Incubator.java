@@ -3,13 +3,13 @@ package gen_alg;
 import java.util.ArrayList;
 import java.util.concurrent.Flow;
 
-public interface Incubator {
+public interface Incubator extends Runnable {
     //Nest setters/getters
     void setPopulation(Integer population);
     //Calendar setters/getters
     void addGenerationPeeker(Flow.Subscriber<GenerationCompleteEvent> generationPeeker);
     Integer getGenerationCount();
-    void setMaxGenerationCount(Integer maxGenerationCount);
+    void setMaxGenerationCount(Integer maxGenerationCount);//Integer.MAX_VALUE dla nawiększej możliwej liczby pokoleń
     Integer getMaxGenerationCount();
     void setDelayInMs(Integer delayInMs);
     Integer getDelayInMs();
@@ -23,8 +23,8 @@ public interface Incubator {
     GeneCrossTemplate getGeneticCrossReference();
 
     //monitoring
-    ArrayList<Specimen> getSpecimen();
+    ArrayList<? extends Specimen> getSpecimen();
 
     //Start func
-    void Start() throws Exception;
+    void run();
 }

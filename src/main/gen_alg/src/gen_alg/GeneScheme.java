@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class GeneScheme {
     Allele template;
-    AlleleFactory alleleGenerator;
+    AlleleFactory alleleGenerator= new AlleleFactory();
     ArrayList<Allele> alleles=new ArrayList<>();
     GeneScheme(Allele template){
         initializeAlleleFactory(template);
@@ -16,7 +16,7 @@ public class GeneScheme {
 
     void generateAlleles(Integer length) throws Exception {
         for(int i=0;i<length;i++){
-            alleleGenerator.generateAllele();
+            alleles.add(alleleGenerator.generateAllele());
         }
     }
     public boolean isInitialised(){

@@ -71,7 +71,7 @@ public class PostaciTabClass {
         Optional<String> wynik = new GiveNameDialog("konfiguracji").showAndWait();
         if(wynik.isPresent()) {
             String nazwaBuildu = wynik.get();
-            Build build = new Build(nazwaBuildu, 0, 0, 0, 0, postac.getID());
+            Build build = new Build(0,nazwaBuildu, 0, 0, 0, 0, postac.getID());
             postac.PobierzDaneBuildow().AddNewBuildSet(build);
             olistBuilds.add(nazwaBuildu);
             ctrls.getConfigChoice().setItems(olistBuilds);
@@ -244,8 +244,14 @@ public class PostaciTabClass {
             public void changed(ObservableValue<? extends String> observableValue, String old, String newval) {
                 Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
                 Build build = postac.PobierzBuild(ctrls.getConfigChoice().getValue());
-                if(build!=null&&checkIfDigitAndCorrect(ctrls.getEstCPField()))
-                    build.EstCP= Integer.parseInt(newval);
+                if(build!=null&&checkIfDigitAndCorrect(ctrls.getEstCPField())) {
+                    build.EstCP = Integer.parseInt(newval);
+                    try {
+                        CharacterAutoSaveSurgeon.getBuildSurgeon().scheduleUpdate(build);
+                    } catch (NoActiveConnectionException|SQLException e){
+                        System.err.println(e.getMessage());
+                    }
+                }
             }
         });
 
@@ -254,8 +260,14 @@ public class PostaciTabClass {
             public void changed(ObservableValue<? extends String> observableValue, String old, String newval) {
                 Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
                 Build build = postac.PobierzBuild(ctrls.getConfigChoice().getValue());
-                if(build!=null&&checkIfDigitAndCorrect(ctrls.getEDMultipField()))
+                if(build!=null&&checkIfDigitAndCorrect(ctrls.getEDMultipField())){
                     build.EDMultip= Integer.parseInt(newval);
+                try {
+                    CharacterAutoSaveSurgeon.getBuildSurgeon().scheduleUpdate(build);
+                } catch (NoActiveConnectionException|SQLException e){
+                    System.err.println(e.getMessage());
+                }
+                }
             }
         });
 
@@ -265,7 +277,14 @@ public class PostaciTabClass {
                 Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
                 Build build = postac.PobierzBuild(ctrls.getConfigChoice().getValue());
                 if(build!=null&&checkIfDigitAndCorrect(ctrls.getIDMultipField()))
-                    build.IDMultip= Integer.parseInt(newval);
+                    {
+                        build.IDMultip = Integer.parseInt(newval);
+                        try {
+                            CharacterAutoSaveSurgeon.getBuildSurgeon().scheduleUpdate(build);
+                        } catch (NoActiveConnectionException|SQLException e){
+                            System.err.println(e.getMessage());
+                        }
+                    }
             }
         });
 
@@ -274,8 +293,14 @@ public class PostaciTabClass {
             public void changed(ObservableValue<? extends String> observableValue, String old, String newval) {
                 Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
                 Build build = postac.PobierzBuild(ctrls.getConfigChoice().getValue());
-                if(build!=null&&checkIfDigitAndCorrect(ctrls.getEDMultipField()))
-                    build.EDMultip= Integer.parseInt(newval);
+                if(build!=null&&checkIfDigitAndCorrect(ctrls.getEDMultipField())) {
+                    build.EDMultip = Integer.parseInt(newval);
+                    try {
+                        CharacterAutoSaveSurgeon.getBuildSurgeon().scheduleUpdate(build);
+                    } catch (NoActiveConnectionException|SQLException e){
+                        System.err.println(e.getMessage());
+                    }
+                }
             }
         });
         ctrls.getEXPMultipField().textProperty().addListener(new ChangeListener<String>() {
@@ -283,8 +308,14 @@ public class PostaciTabClass {
             public void changed(ObservableValue<? extends String> observableValue, String old, String newval) {
                 Postac postac = konto.PobierzPostac(CharacterList.getSelectionModel().getSelectedItem());
                 Build build = postac.PobierzBuild(ctrls.getConfigChoice().getValue());
-                if(build!=null&&checkIfDigitAndCorrect(ctrls.getEXPMultipField()))
-                    build.EXPMultip= Integer.parseInt(newval);
+                if(build!=null&&checkIfDigitAndCorrect(ctrls.getEXPMultipField())) {
+                    build.EXPMultip = Integer.parseInt(newval);
+                    try {
+                        CharacterAutoSaveSurgeon.getBuildSurgeon().scheduleUpdate(build);
+                    } catch (NoActiveConnectionException|SQLException e){
+                        System.err.println(e.getMessage());
+                    }
+                }
             }
         });
 
