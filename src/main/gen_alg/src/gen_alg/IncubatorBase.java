@@ -10,6 +10,8 @@ public class IncubatorBase implements Incubator{
     ArrayList<Specimen> specimenArrayList = new ArrayList<>();
     Calendar generationFlow=new Calendar(this);
     Nest nest;
+    Double mutProb=0.1;
+    GeneCrossTemplate genCrosRef;
 
     //MAIN INIT
     public IncubatorBase(Specimen template){
@@ -22,11 +24,17 @@ public class IncubatorBase implements Incubator{
         try {
             specimenArrayList=nest.generateStartPopulation();
             splicer = new Splicer(specimenArrayList);
+            splicer.mutationProbability=mutProb;
+            if(genCrosRef!=null){
+                splicer.geneticCrossReference=genCrosRef;
+            }
             generationFlow.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    public Object getLock(){return generationFlow.getLock();}
 
     //OPTIONAL SETTERS/GETTERS
     //Nest setters/getters
@@ -76,7 +84,10 @@ public class IncubatorBase implements Incubator{
     //Splicer setters/getters
     @Override
     public void setMutationProbability(Double mutationProbability) {
-        splicer.mutationProbability=mutationProbability;
+        if(splicer!=null)
+            splicer.mutationProbability=mutationProbability;
+        else
+            mutProb=mutationProbability;
     }
 
     @Override
@@ -86,7 +97,11 @@ public class IncubatorBase implements Incubator{
 
     @Override
     public void setGeneticCrossReference(GeneCrossTemplate geneticCrossReference) {
-        splicer.geneticCrossReference=geneticCrossReference;
+        if(splicer!=null)
+            splicer.geneticCrossReference=geneticCrossReference;
+        else
+            genCrosRef=geneticCrossReference;
+
     }
 
     @Override
@@ -96,6 +111,6 @@ public class IncubatorBase implements Incubator{
 
     @Override
     public ArrayList<? extends Specimen> getSpecimen() {
-        return (ArrayList<Specimen>) specimenArrayList.clone();
+        return specimenArrayList;
     }
 }

@@ -1,4 +1,7 @@
 Wyrwa_Tracker_Data
-WzorBackup.db
 BazaTestowa.db
-TestNowaLokacja.db
+WzorBackup.db
+WzorBackupOldVer.db
+SzkieletDanych.db
+test.db
+dataFilledTest.db

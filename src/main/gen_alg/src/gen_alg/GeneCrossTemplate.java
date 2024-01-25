@@ -14,7 +14,7 @@ public class GeneCrossTemplate {
     LinkedList<LinkedList<Integer>> crossModel;//scheme of passing down the alleles 1=parent1, 2=parent2 only 1 or 2 possible
     ArrayList<Double> weights;//weight of a specimen after sorting specimen list
     //GCTIterator iterator;
-    GeneCrossTemplate(LinkedList<Double> percentage, LinkedList<LinkedList<Integer>> crossModel, ArrayList<Double> weights , boolean autoEnabled) throws Exception {
+    public GeneCrossTemplate(LinkedList<Double> percentage, LinkedList<LinkedList<Integer>> crossModel, ArrayList<Double> weights, boolean autoEnabled) throws Exception {
         Double suma=0.0;
         for(Double perc : percentage){
             suma+=perc;

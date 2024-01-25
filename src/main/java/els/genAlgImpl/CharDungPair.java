@@ -112,4 +112,12 @@ public class CharDungPair extends Allele{
                 "WHERE DungeonID="+dungeonIDRange.get(chosenDungeonIndex)+" and BuildSetID="+buildIDRange.get(chosenBuildIndex)+" and EstCP>OptimalCP and Status like 'Active'");
         return !rs.next();
     }
+
+    public Integer getChosenDungeonID() {
+        return chosenDungeonID;
+    }
+
+    public Integer getChosenBuildID(){
+        return chosenBuildID;
+    }
 }

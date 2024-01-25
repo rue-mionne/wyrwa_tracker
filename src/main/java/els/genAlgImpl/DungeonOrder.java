@@ -72,4 +72,6 @@ public class DungeonOrder extends Specimen{
     public void setAlleleTemplate(CharDungPair alleleTemplate) {
         this.alleleTemplate = alleleTemplate;
     }
+
+    public ArrayList<? extends Allele> getOrder(){return getGenetics().getAlleles();}
 }

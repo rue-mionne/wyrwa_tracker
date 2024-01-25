@@ -53,18 +53,21 @@ public class Splicer {
             Specimen parent2 = getRandomSpecimen(spinningWheel);
             Specimen newSpecimen = parent1.generateNewSpecimen();
             createNewSpecimenGenome(crossModel, newSpecimen, parent1, parent2);
+            localMutationProbability=mutationProbability;
             checkForMutations(newSpecimen);
             newGen.add(newSpecimen);
             newSpecimen.score = newSpecimen.evaluateGenomeValue();
             foundPerfect= newSpecimen.heuCheck();
         }
     }
-
+    double localMutationProbability;
     private void checkForMutations(Specimen newSpecimen) throws Exception {
-        if(Math.random()<mutationProbability) {
+        if(Math.random()<localMutationProbability) {
             Allele template = newSpecimen.genetics.template;
             int mutatedAllele = (int) (Math.random() * newSpecimen.genetics.alleles.size());
             newSpecimen.genetics.alleles.set(mutatedAllele, template.generateNewAllele());
+            localMutationProbability=localMutationProbability;
+            checkForMutations(newSpecimen);
         }
     }
 

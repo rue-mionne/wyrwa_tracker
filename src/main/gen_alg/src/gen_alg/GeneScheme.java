@@ -27,7 +27,7 @@ public class GeneScheme {
         return alleles.size();
     }
 
-    ArrayList<Allele> getAlleles(){
+    public ArrayList<Allele> getAlleles(){
         return alleles;
     }
 }

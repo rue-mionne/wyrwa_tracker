@@ -4,25 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6031738e-0eb2-4ae9-9414-500760bd732d" name="Changes" comment="Algorithm module bug fixes + implementation of the module in project">
-      <change afterPath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/AnalizaFields.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/KowalskiAnalysis.java" afterDir="false" />
+    <list default="true" id="6031738e-0eb2-4ae9-9414-500760bd732d" name="Changes" comment="Algorithm calibration + minimal analysis tab implementation">
+      <change afterPath="$PROJECT_DIR$/src/main/java/els/data/DungeonBuildInformationCombo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/Calendar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/Calendar.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/GeneCrossTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/GeneCrossTemplate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/GeneScheme.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/GeneScheme.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/Incubator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/Incubator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/IncubatorBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/IncubatorBase.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/Splicer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/gen_alg/src/gen_alg/Splicer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/els/data/Build.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/data/Build.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/els/genAlgImpl/CharDungPair.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/genAlgImpl/CharDungPair.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/els/genAlgImpl/DungeonOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/genAlgImpl/DungeonOrder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/els/mediators/CharacterSQLMediator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/mediators/CharacterSQLMediator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/els/surgeons/BuildSurgeon.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/surgeons/BuildSurgeon.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/els/surgeons/CharacterSurgeon.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/surgeons/CharacterSurgeon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/AnalizaFields.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/AnalizaFields.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/KowalskiAnalysis.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/KowalskiAnalysis.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/MainWinController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/MainWinController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/PostaciTabClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/els/wyrwatracker/PostaciTabClass.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/els/testowaBazaServerow" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/els/testowaBazaServerow" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/els/wyrwatracker/MainWin.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/els/wyrwatracker/MainWin.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -234,7 +230,15 @@
       <option name="project" value="LOCAL" />
       <updated>1704320281260</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Algorithm calibration + minimal analysis tab implementation">
+      <option name="closed" value="true" />
+      <created>1705527867191</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1705527867191</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -267,7 +271,8 @@
     <MESSAGE value="Created basic class structure for algorithm using biological terms as a guideline" />
     <MESSAGE value="Raw draft of algorithm module, start of refactoring for external use" />
     <MESSAGE value="Algorithm module bug fixes + implementation of the module in project" />
-    <option name="LAST_COMMIT_MESSAGE" value="Algorithm module bug fixes + implementation of the module in project" />
+    <MESSAGE value="Algorithm calibration + minimal analysis tab implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Algorithm calibration + minimal analysis tab implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

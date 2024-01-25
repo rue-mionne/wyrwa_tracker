@@ -171,7 +171,7 @@ public class MainWinController {
         PostaciTabClass postaciTab = new PostaciTabClass(baza, postaciTabPack);
         postaciTab.PostaciLoadUnload(new Event(new EventType<>()));
         AnalizaFields analizaFields = new AnalizaFields(GenerationCounter, PathCol,ScoreCol,StartStopButton, MainOverview, DetailedOverview, CharacterPathData, DungeonPathData, QuestPathData,SzablonPrzeplotowSpinner, PopulacjaSpinner, MutProbSpinner, MaxIlPokSpinner,DelaySpinner);
-        KowalskiAnalysis analysisTab = new KowalskiAnalysis(sqlboss,analizaFields);
+        KowalskiAnalysis analysisTab = new KowalskiAnalysis(baza,analizaFields);
     }
 
     //

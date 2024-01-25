@@ -7,6 +7,7 @@ public interface Incubator extends Runnable {
     //Nest setters/getters
     void setPopulation(Integer population);
     //Calendar setters/getters
+    Object getLock();
     void addGenerationPeeker(Flow.Subscriber<GenerationCompleteEvent> generationPeeker);
     Integer getGenerationCount();
     void setMaxGenerationCount(Integer maxGenerationCount);//Integer.MAX_VALUE dla nawiększej możliwej liczby pokoleń
